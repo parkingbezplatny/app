@@ -1,26 +1,6 @@
-// import NextAuth from "next-auth/next";
-// import { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth/next";
+import { authOptions } from "@/lib/nextauth/authOptions";
 
-// export const authOptions: NextAuthOptions = {
-//   session: {
-//     strategy: "jwt",
-//   },
-//   providers: [],
-//   pages: {
-//     signIn: "/sign-in",
-//   },
+const handler = NextAuth(authOptions);
 
-//   callbacks: {
-//     async jwt({ user, token, trigger }) {
-//       return token;
-//     },
-
-//     async session({ session, token }) {
-//       return session;
-//     },
-//   },
-// };
-
-// const handler = NextAuth(authOptions);
-
-// export { handler as GET, handler as POST };
+export { handler as GET, handler as POST };
