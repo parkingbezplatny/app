@@ -1,0 +1,38 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.8.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@prisma/client": "^5.4.2",
+    "@tanstack/react-query": "^4.36.1",
+    "axios": "^1.5.1",
+    "framer-motion": "^10.16.4",
+    "next": "13.5.4",
+    "next-auth": "^4.23.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.47.0",
+    "react-icons": "^4.11.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "13.5.4",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.0.3",
+    "prisma": "^5.4.2",
+    "typescript": "^5"
+  }
+}
