@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -7,14 +8,14 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      id: "credentials",
+      name: "credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
-        password: { label: "Password", type: "password" },
+        email: { type: "email", label: "email" },
+        password: { type: "password", label: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const user = { id: "1", name: "J Smith", email: "jsmith@example.com" };
-
         if (user) {
           return user;
         } else {
@@ -22,17 +23,29 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    GoogleProvider({
+      id: "google",
+      name: "google",
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    }),
   ],
-  //   pages: {
-  //     signIn: "/sign-in",
-  //   },
+  pages: {
+    signIn: "/sign-in",
+  },
 
   callbacks: {
-    async jwt({ user, token, trigger }) {
+    async jwt({ user, token, account, profile }) {
       return token;
     },
 
     async session({ session, token }) {
+      if (token) {
+        session.user = {
+          email: token.email,
+          name: token.name,
+        };
+      }
       return session;
     },
   },
