@@ -28,7 +28,7 @@ function WelcomePage() {
         parkingowego już teraz!
       </Text>
       <Flex mt={4}>
-        <Link href="/pages/sign-in">
+        <Link href="/sign-in">
           <Button
             size={{ base: "sm", md: "md" }}
             bg="orange.400"
@@ -41,7 +41,7 @@ function WelcomePage() {
             Zaloguj się
           </Button>
         </Link>
-        <Link href="/pages/sign-up">
+        <Link href="/sign-up">
           <Button
             size={{ base: "sm", md: "md" }}
             bg="orange.500"
