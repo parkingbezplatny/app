@@ -18,8 +18,23 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
+import { signIn } from "next-auth/react";
 
 function SignIn() {
+  const googleSignIn = async () => {
+    await signIn("google", {
+      callbackUrl: "/",
+    });
+  };
+
+  const credentialSignIn = async () => {
+    await signIn("credentials", {
+      email: "email",
+      password: "password",
+      callbackUrl: "/",
+    });
+  };
+
   return (
     <Flex
       minH={"90vh"}
@@ -49,6 +64,7 @@ function SignIn() {
             </FormControl>
             <Stack spacing={6}>
               <Button
+                onClick={credentialSignIn}
                 mt={2}
                 bg="orange.400"
                 _hover={{
@@ -71,6 +87,7 @@ function SignIn() {
               </HStack>
               <Button
                 leftIcon={<Icon as={FaGoogle} />}
+                onClick={googleSignIn}
                 border={"1px solid #e4e4e7"}
                 bg={"white"}
                 _hover={{
