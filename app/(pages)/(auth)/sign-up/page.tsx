@@ -19,7 +19,7 @@ import {
 function SignUp() {
   return (
     <Flex
-      minH={"90vh"}
+      minH={"90dvh"}
       align={"center"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
