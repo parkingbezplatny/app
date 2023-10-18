@@ -9,16 +9,16 @@ datasource db {
 }
 
 model User {
-  id       Int        @id @default(autoincrement())
-  email    String     @unique
-  password String
-  username String
-  isAdmin  Boolean    @default(false)
-  favorite Favorite[]
-  rating   Rating[]
+  id               Int                      @id @default(autoincrement())
+  email            String                   @unique
+  password         String
+  username         String
+  isAdmin          Boolean                  @default(false)
+  favoriteParkings FavoriteParkingAndUser[]
+  parkingRatings   RatingParkingAndUser[]
 }
 
-model Favorite {
+model FavoriteParkingAndUser {
   id        Int     @id @default(autoincrement())
   user      User    @relation(fields: [userId], references: [id])
   userId    Int
@@ -26,7 +26,7 @@ model Favorite {
   parkingId Int
 }
 
-model Rating {
+model RatingParkingAndUser {
   id        Int     @id @default(autoincrement())
   user      User    @relation(fields: [userId], references: [id])
   userId    Int
@@ -35,10 +35,10 @@ model Rating {
 }
 
 model Parking {
-  id       Int        @id @default(autoincrement())
-  lat      Float
-  lng      Float
-  place    String
-  favorite Favorite[]
-  rating   Rating[]
+  id            Int                      @id @default(autoincrement())
+  lat           Float
+  lng           Float
+  place         String
+  favoriteUsers FavoriteParkingAndUser[]
+  userRatings   RatingParkingAndUser[]
 }
