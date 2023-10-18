@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "npx prisma migrate dev"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.1",
@@ -35,5 +36,8 @@
     "prettier": "^3.0.3",
     "prisma": "^5.4.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "schema": "./lib/prisma/schema.prisma"
   }
 }
