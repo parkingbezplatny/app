@@ -21,7 +21,36 @@ export async function createUser({
       data: {
         email: email,
         password: hashedPassword,
+        isGoogle: false,
         username: username,
+      },
+    });
+
+    const newUser = await getUserByEmail(email);
+    if (!newUser) return null;
+
+    return newUser;
+  } catch (err: any) {
+    throw err;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function createGoogleUser(
+  email: string,
+  username: string
+): Promise<TUserDatabase | null> {
+  try {
+    const user = await getUserByEmail(email);
+    if (user) return null;
+
+    await prisma.user.create({
+      data: {
+        email: email,
+        username: username,
+        password: "google",
+        isGoogle: true,
       },
     });
 
@@ -48,6 +77,7 @@ export async function getUserByEmail(
         email: true,
         id: true,
         isAdmin: true,
+        isGoogle: true,
         username: true,
         favoriteParkings: {
           select: {
@@ -75,6 +105,7 @@ export async function getUserById(id: string) {
         email: true,
         id: true,
         isAdmin: true,
+        isGoogle: true,
         username: true,
         favoriteParkings: {
           select: {
@@ -99,6 +130,7 @@ export async function getUsers(): Promise<TUsersDatabase> {
         email: true,
         id: true,
         isAdmin: true,
+        isGoogle: true,
         username: true,
         favoriteParkings: { select: { parking: true } },
       },
