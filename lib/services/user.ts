@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../helpers/errorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
 import prisma from "../prisma/prismaClient";
 import { TUserDatabase, TUsersDatabase } from "../types";
@@ -10,10 +11,10 @@ export async function createUser({
   email: string;
   password: string;
   username: string;
-}): Promise<TUserDatabase | null> {
+}): Promise<TUserDatabase> {
   try {
     const user = await getUserByEmail(email);
-    if (user) return null;
+    if (user) throw new Error("Użytkownik już istnieje");
 
     const hashedPassword = await hashPassword(password);
 
@@ -27,11 +28,11 @@ export async function createUser({
     });
 
     const newUser = await getUserByEmail(email);
-    if (!newUser) return null;
+    if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
 
     return newUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -40,10 +41,10 @@ export async function createUser({
 export async function createGoogleUser(
   email: string,
   username: string
-): Promise<TUserDatabase | null> {
+): Promise<TUserDatabase> {
   try {
     const user = await getUserByEmail(email);
-    if (user) return null;
+    if (user) throw new Error("Użytkownik już istnieje");
 
     await prisma.user.create({
       data: {
@@ -55,19 +56,17 @@ export async function createGoogleUser(
     });
 
     const newUser = await getUserByEmail(email);
-    if (!newUser) return null;
+    if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
 
     return newUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getUserByEmail(
-  email: string
-): Promise<TUserDatabase | null> {
+export async function getUserByEmail(email: string): Promise<TUserDatabase> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -87,15 +86,17 @@ export async function getUserByEmail(
       },
     });
 
+    if (!user) throw new Error("Nie znaleziono użytkownika");
+
     return user;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getUserById(id: string) {
+export async function getUserById(id: string): Promise<TUserDatabase> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -115,9 +116,11 @@ export async function getUserById(id: string) {
       },
     });
 
+    if (!user) throw new Error("Nie znaleziono użytkownika");
+
     return user;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -137,9 +140,12 @@ export async function getUsers(): Promise<TUsersDatabase> {
       orderBy: { id: "asc" },
     });
 
+    if (!users || users.length <= 0)
+      throw new Error("Nie znaleziono użytkowników");
+
     return users;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -151,10 +157,10 @@ export async function updateUserByEmail({
 }: {
   email: string;
   username: string;
-}): Promise<TUserDatabase | null> {
+}): Promise<TUserDatabase> {
   try {
     const user = await getUserByEmail(email);
-    if (!user) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
 
     await prisma.user.update({
       data: {
@@ -166,9 +172,10 @@ export async function updateUserByEmail({
     });
 
     const updateUser = await getUserByEmail(email);
+    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -180,10 +187,10 @@ export async function updateUserById({
 }: {
   id: string;
   username: string;
-}): Promise<TUserDatabase | null> {
+}): Promise<TUserDatabase> {
   try {
     const user = await getUserById(id);
-    if (!user) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
 
     await prisma.user.update({
       data: {
@@ -195,9 +202,10 @@ export async function updateUserById({
     });
 
     const updateUser = await getUserById(id);
+    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -211,7 +219,7 @@ export async function updateUserPasswordByEmail({
   email: string;
   oldPassword: string;
   newPassword: string;
-}): Promise<TUserDatabase | null> {
+}): Promise<TUserDatabase> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -219,8 +227,9 @@ export async function updateUserPasswordByEmail({
       },
     });
 
-    if (!user) return null;
-    if (!(await comparePassword(oldPassword, user.password))) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!(await comparePassword(oldPassword, user.password)))
+      throw new Error("Aktualne hasło jest nieprawidłowe");
 
     const hashedPassword = await hashPassword(newPassword);
 
@@ -234,11 +243,11 @@ export async function updateUserPasswordByEmail({
     });
 
     const updateUser = await getUserByEmail(email);
-    if (!updateUser) return null;
+    if (!updateUser) throw new Error("Błąd zmiany hasła");
 
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -252,7 +261,7 @@ export async function updateUserPasswordById({
   id: string;
   oldPassword: string;
   newPassword: string;
-}): Promise<TUserDatabase | null> {
+}): Promise<TUserDatabase> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -260,8 +269,9 @@ export async function updateUserPasswordById({
       },
     });
 
-    if (!user) return null;
-    if (!(await comparePassword(oldPassword, user.password))) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!(await comparePassword(oldPassword, user.password)))
+      throw new Error("Aktualne hasło jest nieprawidłowe");
 
     const hashedPassword = await hashPassword(newPassword);
 
@@ -275,11 +285,11 @@ export async function updateUserPasswordById({
     });
 
     const updateUser = await getUserById(id);
-    if (!updateUser) return null;
+    if (!updateUser) throw new Error("Błąd zmiany hasła");
 
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -288,10 +298,10 @@ export async function updateUserPasswordById({
 export async function updateUserAdminByEmail(
   email: string,
   isAdmin: boolean
-): Promise<TUserDatabase | null> {
+): Promise<TUserDatabase> {
   try {
     const user = await getUserByEmail(email);
-    if (!user) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
 
     await prisma.user.update({
       data: {
@@ -303,11 +313,11 @@ export async function updateUserAdminByEmail(
     });
 
     const updateUser = await getUserByEmail(email);
-    if (!updateUser) return null;
+    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
 
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -316,10 +326,10 @@ export async function updateUserAdminByEmail(
 export async function updateUserAdminById(
   id: string,
   isAdmin: boolean
-): Promise<TUserDatabase | null> {
+): Promise<TUserDatabase> {
   try {
     const user = await getUserById(id);
-    if (!user) return null;
+    if (!user) throw new Error("Nie znaleziono użytkownika");
 
     await prisma.user.update({
       data: {
@@ -331,11 +341,11 @@ export async function updateUserAdminById(
     });
 
     const updateUser = await getUserById(id);
-    if (!updateUser) return null;
+    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
 
     return updateUser;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -346,8 +356,8 @@ export async function deleteUserByEmail(email: string): Promise<void> {
     await prisma.user.delete({
       where: { email: email },
     });
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -358,8 +368,8 @@ export async function deleteUserById(id: string): Promise<void> {
     await prisma.user.delete({
       where: { id: parseInt(id) },
     });
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }

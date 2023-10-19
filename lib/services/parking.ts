@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../helpers/errorMessage";
 import prisma from "../prisma/prismaClient";
 import { TParkingDatabase, TParkingsDatabase } from "../types";
 import { getUserById } from "./user";
@@ -10,7 +11,7 @@ export async function createParking({
   lat: string;
   lng: string;
   place: string;
-}): Promise<TParkingDatabase | null> {
+}): Promise<TParkingDatabase> {
   try {
     const newParking = await prisma.parking.create({
       data: {
@@ -21,18 +22,16 @@ export async function createParking({
     });
 
     const parking = await getParkingById(newParking.id.toString());
-    if (!parking) return null;
+    if (!parking) throw new Error("Błąd utworzenia nowego parkingu");
     return parking;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getParkingById(
-  id: string
-): Promise<TParkingDatabase | null> {
+export async function getParkingById(id: string): Promise<TParkingDatabase> {
   try {
     const parking = await prisma.parking.findUnique({
       include: {
@@ -48,10 +47,10 @@ export async function getParkingById(
       },
     });
 
-    if (!parking) return null;
+    if (!parking) throw new Error("Nie znaleziono parkingu");
     return parking;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -75,9 +74,12 @@ export async function getParkingsByPlace(
       },
     });
 
+    if (!parkings || parkings.length <= 0)
+      throw new Error("Nie znaleziono parkingów");
+
     return parkings;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -96,9 +98,12 @@ export async function getParkings(): Promise<TParkingsDatabase> {
       },
     });
 
+    if (!parkings || parkings.length <= 0)
+      throw new Error("Nie znaleziono parkingów");
+
     return parkings;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -114,10 +119,10 @@ export async function updateParkingById({
   lat: string;
   lng: string;
   place: string;
-}): Promise<TParkingDatabase | null> {
+}): Promise<TParkingDatabase> {
   try {
     const parking = await getParkingById(id);
-    if (!parking) return null;
+    if (!parking) throw new Error("Nie znaleziono parkingu");
 
     await prisma.parking.update({
       data: {
@@ -131,11 +136,11 @@ export async function updateParkingById({
     });
 
     const updateParking = await getParkingById(id);
-    if (!updateParking) return null;
+    if (!updateParking) throw new Error("Błąd aktualizacji danych parkingu");
 
     return updateParking;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -154,8 +159,8 @@ export async function deleteParkingById(id: string) {
       },
     });
     await prisma.parking.delete({ where: { id: parseInt(id) } });
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -169,12 +174,13 @@ export async function rateParkingById({
   parkingId: string;
   userId: string;
   rating: string;
-}): Promise<TParkingDatabase | null> {
+}): Promise<TParkingDatabase> {
   try {
     const parking = await getParkingById(parkingId);
     const user = await getUserById(userId);
 
-    if (!parking || !user) return null;
+    if (!parking || !user)
+      throw new Error("Nie znaleziono użytkownika lub parkingu");
 
     const ratedParkingByUser = await prisma.ratingParkingAndUser.findFirst({
       where: {
@@ -209,10 +215,10 @@ export async function rateParkingById({
     }
 
     const rateParking = await getParkingById(parkingId);
-    if (!rateParking) return null;
+    if (!rateParking) throw new Error("Błąd oceniania parkingu");
     return rateParking;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -221,12 +227,13 @@ export async function rateParkingById({
 export async function addToFavoriteParkingById(
   parkingId: string,
   userId: string
-): Promise<TParkingDatabase | null> {
+): Promise<TParkingDatabase> {
   try {
     const parking = await getParkingById(parkingId);
     const user = await getUserById(userId);
 
-    if (!parking || !user) return null;
+    if (!parking || !user)
+      throw new Error("Nie znaleziono użytkownika lub parkingu");
 
     const favoredParkingByUser = await prisma.favoriteParkingAndUser.findFirst({
       where: {
@@ -241,7 +248,7 @@ export async function addToFavoriteParkingById(
       },
     });
 
-    if (favoredParkingByUser) return null;
+    if (favoredParkingByUser) throw new Error("Parking już jest w ulubionych");
 
     await prisma.favoriteParkingAndUser.create({
       data: {
@@ -251,10 +258,11 @@ export async function addToFavoriteParkingById(
     });
 
     const favoriteParking = await getParkingById(parkingId);
-    if (!favoriteParking) return null;
+    if (!favoriteParking)
+      throw new Error("Błąd dodawania parkingu do ulubionych");
     return favoriteParking;
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
@@ -263,12 +271,13 @@ export async function addToFavoriteParkingById(
 export async function removeFromFavoriteParkingById(
   parkingId: string,
   userId: string
-): Promise<void | null> {
+): Promise<void> {
   try {
     const parking = await getParkingById(parkingId);
     const user = await getUserById(userId);
 
-    if (!parking || !user) return null;
+    if (!parking || !user)
+      throw new Error("Nie znaleziono użytkownika lub parkingu");
 
     const favoredParkingByUser = await prisma.favoriteParkingAndUser.findFirst({
       where: {
@@ -283,15 +292,15 @@ export async function removeFromFavoriteParkingById(
       },
     });
 
-    if (!favoredParkingByUser) return null;
+    if (!favoredParkingByUser) throw new Error("Parking nie jest w ulubionych");
 
     await prisma.favoriteParkingAndUser.delete({
       where: {
         id: favoredParkingByUser.id,
       },
     });
-  } catch (err: any) {
-    throw err;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
