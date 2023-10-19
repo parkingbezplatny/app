@@ -43,8 +43,8 @@ export async function createGoogleUser(
   username: string
 ): Promise<TUserDatabase> {
   try {
-    const user = await getUserByEmail(email);
-    if (user) throw new Error("Użytkownik już istnieje");
+    // const user = await getUserByEmail(email);
+    // if (user) throw new Error("Użytkownik już istnieje");
 
     await prisma.user.create({
       data: {

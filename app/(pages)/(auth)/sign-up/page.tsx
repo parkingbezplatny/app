@@ -14,9 +14,31 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  FormErrorMessage,
 } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
+import { TSignUpForm } from "@/lib/types";
 
 function SignUp() {
+  const [signUpError, setSignUpError] = useState<string>("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<TSignUpForm>({
+    resolver: zodResolver(SignUpValidation),
+    mode: "onChange",
+  });
+
+  const credentialSignUp = async (values: TSignUpForm) => {
+    setSignUpError("");
+    // TODO Call to API with values
+    console.log(values);
+    setSignUpError("TODO Call to API with values");
+  };
+
   return (
     <Flex
       minH={"90dvh"}
@@ -36,50 +58,102 @@ function SignUp() {
             Zarejestruj się
           </Heading>
           <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-            <FormControl id="email">
-              <FormLabel fontSize={"md"}>Email</FormLabel>
-              <Input
-                type="email"
-                placeholder="Wpisz adres email"
-                focusBorderColor="orange.500"
-              />
-            </FormControl>
-            <FormControl id="username">
-              <FormLabel fontSize={"md"}>Nazwa użytkownika</FormLabel>
-              <Input
-                type="text"
-                placeholder="Wpisz nazwę użytkownika"
-                focusBorderColor="orange.500"
-              />
-            </FormControl>
-            <FormControl id="password">
-              <FormLabel>Hasło</FormLabel>
-              <Input
-                type="password"
-                placeholder="Wpisz hasło"
-                focusBorderColor="orange.500"
-              />
-            </FormControl>
-            <FormControl id="confirmedPassword">
-              <FormLabel>Powtórz hasło</FormLabel>
-              <Input
-                type="password"
-                placeholder="Wpisz ponownie hasło"
-                focusBorderColor="orange.500"
-              />
-            </FormControl>
-            <Stack spacing={6}>
-              <Button
-                mt={2}
-                bg="orange.500"
-                _hover={{
-                  bg: "#C05621",
-                }}
-                textColor="white"
+            {signUpError && (
+              <Box
+                w="100%"
+                p={4}
+                border="1px"
+                borderColor="red.400"
+                rounded={10}
+                color="red.600"
+                fontWeight="semibold"
               >
-                Zarejestruj się
-              </Button>
-            </Stack>
+                {signUpError}
+              </Box>
+            )}
+            <form onSubmit={handleSubmit(credentialSignUp)}>
+              <Stack spacing={4} w={{ base: 300, sm: 400 }}>
+                <FormControl id="email" isInvalid={!!errors.email}>
+                  <FormLabel fontSize="md">Email</FormLabel>
+                  <Input
+                    placeholder="Wpisz adres email"
+                    focusBorderColor="orange.400"
+                    {...register("email", {
+                      required: { value: true, message: "Email jest wymagany" },
+                    })}
+                  />
+                  <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl id="username" isInvalid={!!errors.username}>
+                  <FormLabel fontSize="md">Nazwa użytkownika</FormLabel>
+                  <Input
+                    placeholder="Wpisz nazwę użytkownika"
+                    focusBorderColor="orange.400"
+                    {...register("username", {
+                      required: {
+                        value: true,
+                        message: "Nazwa użytkownika jest wymagana",
+                      },
+                    })}
+                  />
+                  <FormErrorMessage>
+                    {errors.username?.message}
+                  </FormErrorMessage>
+                </FormControl>
+
+                <FormControl
+                  id="password"
+                  isInvalid={!!errors.passwords?.password}
+                >
+                  <FormLabel fontSize="md">Hasło</FormLabel>
+                  <Input
+                    placeholder="Wpisz hasło"
+                    focusBorderColor="orange.400"
+                    {...register("passwords.password", {
+                      required: { value: true, message: "Hasło jest wymagane" },
+                    })}
+                  />
+                  <FormErrorMessage>
+                    {errors.passwords?.password?.message}
+                  </FormErrorMessage>
+                </FormControl>
+
+                <FormControl
+                  id="confirmedPassword"
+                  isInvalid={!!errors.passwords?.confirmedPassword}
+                >
+                  <FormLabel fontSize="md">Powtórz hasło</FormLabel>
+                  <Input
+                    placeholder="Powtórz hasło"
+                    focusBorderColor="orange.400"
+                    {...register("passwords.confirmedPassword", {
+                      required: {
+                        value: true,
+                        message: "Powtórzenie hasła jest wymagane",
+                      },
+                    })}
+                  />
+                  <FormErrorMessage>
+                    {errors.passwords?.confirmedPassword?.message}
+                  </FormErrorMessage>
+                </FormControl>
+
+                <Button
+                  type="submit"
+                  mt={2}
+                  bg="orange.500"
+                  _hover={{
+                    bg: "#C05621",
+                  }}
+                  textColor="white"
+                  isLoading={isSubmitting}
+                >
+                  Zarejestruj się
+                </Button>
+              </Stack>
+            </form>
+
             <Stack pt={2}>
               <Text fontSize={{ base: "sm", sm: "md" }} align={"center"}>
                 Masz już konto?{" "}

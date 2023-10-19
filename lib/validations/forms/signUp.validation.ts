@@ -13,16 +13,16 @@ export const SignUpValidation = z.object({
       password: z
         .string({ required_error: "Hasło jest wymagane" })
         .min(8, { message: "Hasło musi zawierać minumum 8 znaków" }),
-      repetedPassword: z.string({
-        required_error: "Powtórzone hasło jest wymagane",
+      confirmedPassword: z.string({
+        required_error: "Powtórzonie hasła jest wymagane",
       }),
     })
     .superRefine((data, ctx) => {
-      if (data.password !== data.repetedPassword) {
+      if (data.password !== data.confirmedPassword) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Hasła nie są takie same",
-          path: ["repetedPassword"],
+          path: ["confirmedPassword"],
         });
       }
     }),

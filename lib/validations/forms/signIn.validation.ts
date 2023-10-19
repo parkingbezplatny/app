@@ -7,5 +7,5 @@ export const SignInValidation = z.object({
     .email({ message: "Pole musi zawierać adres email" }),
   password: z
     .string({ required_error: "Hasło jest wymagane" })
-    .min(1, { message: "Hasło nie może być puste" }),
+    .min(8, { message: "Hasło musi zawierać minumum 8 znaków" }),
 });
