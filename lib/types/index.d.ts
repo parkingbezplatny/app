@@ -1,37 +1,51 @@
-type TUserDatabase = {
+export type TUserDatabase = {
   email: string;
-  username: string;
   id: number;
+  username: string;
   isAdmin: boolean;
-  favoriteParkings: ({
+  favoriteParkings: {
     parking: {
       id: number;
       lat: number;
       lng: number;
       place: string;
     };
-  } & {
-    id: number;
-    userId: number;
-    parkingId: number;
-  })[];
+  }[];
 };
 
-type TUsersDatabase = {
-  id: number;
+export type TUsersDatabase = {
   email: string;
+  id: number;
   username: string;
   isAdmin: boolean;
-  favoriteParkings: ({
+  favoriteParkings: {
     parking: {
       id: number;
       lat: number;
       lng: number;
       place: string;
     };
-  } & {
-    id: number;
-    userId: number;
-    parkingId: number;
-  })[];
+  }[];
 }[];
+
+export type TParkingDatabase = {
+  userRatings: {
+    rating: number;
+  }[];
+} & {
+  id: number;
+  lat: number;
+  lng: number;
+  place: string;
+};
+
+export type TParkingsDatabase = ({
+  userRatings: {
+    rating: number;
+  }[];
+} & {
+  id: number;
+  lat: number;
+  lng: number;
+  place: string;
+})[];
