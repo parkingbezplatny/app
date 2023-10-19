@@ -2,6 +2,7 @@ export type TUserDatabase = {
   email: string;
   id: number;
   username: string;
+  isGoogle: boolean;
   isAdmin: boolean;
   favoriteParkings: {
     parking: {
@@ -17,6 +18,7 @@ export type TUsersDatabase = {
   email: string;
   id: number;
   username: string;
+  isGoogle: boolean;
   isAdmin: boolean;
   favoriteParkings: {
     parking: {
