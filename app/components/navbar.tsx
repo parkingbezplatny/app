@@ -10,7 +10,6 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Input,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
