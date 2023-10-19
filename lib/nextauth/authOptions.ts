@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { createUser, getUserByEmail } from "../services/user";
 import prisma from "../prisma/prismaClient";
 import { comparePassword } from "../helpers/password";
+import { getErrorMessage } from "../helpers/errorMessage";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -39,8 +40,8 @@ export const authOptions: NextAuthOptions = {
             username: user.username,
             isAdmin: user.isAdmin,
           };
-        } catch (err: any) {
-          throw err;
+        } catch (err: unknown) {
+          throw getErrorMessage(err);
         } finally {
           await prisma.$disconnect();
         }
