@@ -51,7 +51,7 @@ function Dashboard() {
   return (
     <>
       <Navbar />
-      <Box display="flex" height="calc(100vh - 83px)">
+      <Box display="flex" height="calc(100dvh - 83px)">
         {isLargerThanLG || isPanelVisible ? (
           <Slide
             style={{ position: "absolute", top: "83px", width: "25%" }}
@@ -60,7 +60,7 @@ function Dashboard() {
           >
             <Box
               minW="250px"
-              height="100%"
+              height="calc(100dvh - 83px)"
               p={5}
               borderRight="1px solid #A0AEC0"
               bg="white"
