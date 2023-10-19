@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { createUser, getUserByEmail } from "../services/user";
+import { createGoogleUser, getUserByEmail } from "../services/user";
 import prisma from "../prisma/prismaClient";
 import { comparePassword } from "../helpers/password";
 import { getErrorMessage } from "../helpers/errorMessage";
@@ -30,7 +30,10 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user) throw new Error("Nieprawidłowe dane logowania");
-          if (user.isGoogle) throw new Error("Nieprawidłowe dane logowania");
+          if (user.isGoogle)
+            throw new Error(
+              "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
+            );
           if (!(await comparePassword(credentials.password, user.password)))
             throw new Error("Nieprawidłowe dane logowania");
 
@@ -41,7 +44,7 @@ export const authOptions: NextAuthOptions = {
             isAdmin: user.isAdmin,
           };
         } catch (err: unknown) {
-          throw getErrorMessage(err);
+          throw new Error(encodeURI(getErrorMessage(err)));
         } finally {
           await prisma.$disconnect();
         }
@@ -56,22 +59,36 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/sign-in",
+    error: "/sign-in",
   },
 
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user: userSignIn, account }) {
       if (account?.provider === "google") {
-        const userExists = await getUserByEmail(user?.email);
-        if (!userExists) {
-          await createUser({
-            email: user.email,
-            username: user.name ?? "",
-            password: "google",
-          });
+        if (userSignIn) {
+          try {
+            const user = await prisma.user.findUnique({
+              where: {
+                email: userSignIn.email,
+              },
+            });
+
+            if (!user) {
+              await createGoogleUser(userSignIn.email, userSignIn.name ?? "");
+              return true;
+            }
+            if (!user.isGoogle)
+              throw new Error(
+                "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
+              );
+          } catch (err: unknown) {
+            throw new Error(encodeURI(getErrorMessage(err)));
+          }
         }
       }
       return true;
     },
+
     async jwt({ user, token, account }) {
       if (user) {
         if (account?.provider === "google") {
