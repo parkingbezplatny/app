@@ -1,5 +1,6 @@
 import { comparePassword, hashPassword } from "../helpers/password";
 import prisma from "../prisma/prismaClient";
+import { TUserDatabase, TUsersDatabase } from "../types";
 
 export async function createUser({
   email,
@@ -44,13 +45,12 @@ export async function getUserByEmail(
         email: email,
       },
       select: {
-        password: false,
         email: true,
         id: true,
         isAdmin: true,
         username: true,
         favoriteParkings: {
-          include: {
+          select: {
             parking: true,
           },
         },
@@ -65,20 +65,19 @@ export async function getUserByEmail(
   }
 }
 
-export async function getUserById(id: string): Promise<TUserDatabase | null> {
+export async function getUserById(id: string) {
   try {
     const user = await prisma.user.findUnique({
       where: {
         id: parseInt(id),
       },
       select: {
-        password: false,
         email: true,
         id: true,
         isAdmin: true,
         username: true,
         favoriteParkings: {
-          include: {
+          select: {
             parking: true,
           },
         },
@@ -93,16 +92,15 @@ export async function getUserById(id: string): Promise<TUserDatabase | null> {
   }
 }
 
-export async function getUsers(): Promise<TUsersDatabase | null> {
+export async function getUsers(): Promise<TUsersDatabase> {
   try {
     const users = await prisma.user.findMany({
       select: {
-        password: false,
         email: true,
         id: true,
         isAdmin: true,
         username: true,
-        favoriteParkings: { include: { parking: true } },
+        favoriteParkings: { select: { parking: true } },
       },
       orderBy: { id: "asc" },
     });
