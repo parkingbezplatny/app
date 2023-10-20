@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   VStack,
@@ -14,11 +16,16 @@ import {
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [loggedInUser, setLoggedInUser] = useState("Spongebob Squarepants23");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const logout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <Flex
@@ -49,7 +56,7 @@ const Navbar = () => {
       >
         <Flex align="center">
           <Text w={"120px"} fontSize={"sm"} fontWeight={"bold"} mx={2}>
-            {loggedInUser}
+            {session?.user?.username}
           </Text>
           <Button
             bg="orange.400"
@@ -59,7 +66,7 @@ const Navbar = () => {
             textColor="white"
             w="100px"
             size="md"
-            onClick={() => setLoggedInUser("")}
+            onClick={logout}
           >
             Wyloguj się
           </Button>
@@ -75,7 +82,7 @@ const Navbar = () => {
               Aktualnie zalogowany jako:
             </Text>
             <Text mb={4} fontSize={"sm"} fontWeight={"bold"}>
-              {loggedInUser}
+              {session?.user?.username}
             </Text>
             <Button
               size="sm"
@@ -85,7 +92,7 @@ const Navbar = () => {
               }}
               textColor="white"
               w={"full"}
-              onClick={() => setLoggedInUser("")}
+              onClick={logout}
             >
               Wyloguj się
             </Button>
