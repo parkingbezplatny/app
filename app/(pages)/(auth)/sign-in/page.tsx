@@ -17,7 +17,6 @@ import {
   Text,
   useColorModeValue,
   FormErrorMessage,
-  FormHelperText,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import { signIn } from "next-auth/react";
@@ -25,10 +24,9 @@ import { useForm } from "react-hook-form";
 import { TSignInForm } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInValidation } from "@/lib/validations/forms/signIn.validation";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function SignIn() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -45,7 +43,7 @@ function SignIn() {
 
   const googleSignIn = async () => {
     await signIn("google", {
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
   };
 
@@ -53,7 +51,7 @@ function SignIn() {
     await signIn("credentials", {
       email: values.email,
       password: values.password,
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
   };
 
@@ -107,6 +105,7 @@ function SignIn() {
                 <FormControl id="password" isInvalid={!!errors.password}>
                   <FormLabel fontSize="md">Hasło</FormLabel>
                   <Input
+                    type="password"
                     placeholder="Wpisz hasło"
                     focusBorderColor="orange.400"
                     {...register("password", {

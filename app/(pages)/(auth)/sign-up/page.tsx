@@ -108,6 +108,7 @@ function SignUp() {
                 >
                   <FormLabel fontSize="md">Hasło</FormLabel>
                   <Input
+                    type="password"
                     placeholder="Wpisz hasło"
                     focusBorderColor="orange.400"
                     {...register("passwords.password", {
@@ -125,6 +126,7 @@ function SignUp() {
                 >
                   <FormLabel fontSize="md">Powtórz hasło</FormLabel>
                   <Input
+                    type="password"
                     placeholder="Powtórz hasło"
                     focusBorderColor="orange.400"
                     {...register("passwords.confirmedPassword", {
