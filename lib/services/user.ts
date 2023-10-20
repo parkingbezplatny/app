@@ -14,7 +14,13 @@ export async function createUser({
 }): Promise<TUserDatabase> {
   try {
     const user = await getUserByEmail(email);
-    if (user) throw new Error("Użytkownik już istnieje");
+    if (user) {
+      if (user.isGoogle)
+        throw new Error(
+          "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
+        );
+      throw new Error("Użytkownik już istnieje");
+    }
 
     const hashedPassword = await hashPassword(password);
 
