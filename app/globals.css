@@ -9,5 +9,18 @@ body {
   width: 100dvw;
   min-height: 100dvh;
   overflow-x: hidden;
-  background: #F7FAFC;
+  background: #f7fafc;
+}
+
+.map-wrap {
+  position: relative;
+  height: calc(
+    100vh - 120px - 5rem
+  ); /* calculate height of the screen minus the heading */
+}
+
+.map {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
