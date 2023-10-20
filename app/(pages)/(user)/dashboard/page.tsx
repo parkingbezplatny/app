@@ -7,11 +7,13 @@ import {
   Slide,
   IconButton,
   Image,
+  Flex,
 } from "@chakra-ui/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 import Navbar from "components/navbar";
 import SidePanel from "components/sidepanel";
+import Map from "@/components/map";
 
 function Dashboard() {
   const [tab, setTab] = useState("favorites");
@@ -56,6 +58,7 @@ function Dashboard() {
         ) : null}
         {!isLargerThanLG && (
           <IconButton
+            zIndex={999}
             display={{ base: "inherit", lg: "none" }}
             position="absolute"
             top={114}
@@ -67,13 +70,24 @@ function Dashboard() {
           />
         )}
         <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          <Image
+          {/* <Image
             h="100%"
             w="100%"
             objectFit="cover"
             src="https://i.wpimg.pl/1424x936/filerepo.grupawp.pl/api/v1/display/embed/42799308-8932-4908-b3de-95c4bc048308"
             alt="Europe map"
-          />
+          /> */}
+          <Flex justify="flex-end" pt="5rem">
+            <Flex
+              justifyContent="center"
+              w={isPanelVisible ? "70%" : "100%"}
+              h="100%"
+            >
+              <Box w="100%">
+                <Map />
+              </Box>
+            </Flex>
+          </Flex>
         </Box>
       </Box>
     </>
