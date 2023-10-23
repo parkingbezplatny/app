@@ -84,7 +84,10 @@ function Dashboard() {
               h="100%"
             >
               <Box w="100%">
-                <Map />
+                <Map
+                  lng={parkings[0].coordinates.lng}
+                  lat={parkings[0].coordinates.lat}
+                />
               </Box>
             </Flex>
           </Flex>
