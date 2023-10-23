@@ -38,6 +38,16 @@ export default function Map({ lng, lat }: TMapProps) {
         // Add controls to map
         map.current.addControl(new maplibregl.NavigationControl());
 
+        // Add locate me
+        map.current.addControl(
+          new maplibregl.GeolocateControl({
+            positionOptions: {
+              enableHighAccuracy: true,
+            },
+            trackUserLocation: true,
+          })
+        );
+
         // Add geo data to map
         map.current.addSource("places", {
           type: "geojson",
