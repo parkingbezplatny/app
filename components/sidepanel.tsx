@@ -100,6 +100,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
           </Heading>
           <Input
             placeholder="Wyszukaj parking..."
+            borderColor="#d8dce4"
             focusBorderColor="orange.500"
             mb={5}
           />
