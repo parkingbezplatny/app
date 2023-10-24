@@ -45,55 +45,40 @@ function Dashboard() {
 
   return (
     <>
-      <Navbar />
-      <Box display="flex" height="calc(100dvh - 83px)">
-        {isLargerThanLG || isPanelVisible ? (
-          <Slide
-            style={{ position: "absolute", top: "83px", width: "25%" }}
-            direction="left"
-            in={true}
-          >
-            <SidePanel tab={tab} setTab={setTab} parkings={parkings} />
-          </Slide>
-        ) : null}
-        {!isLargerThanLG && (
-          <IconButton
-            zIndex={999}
-            display={{ base: "inherit", lg: "none" }}
-            position="absolute"
-            top={114}
-            left={isPanelVisible ? "260px" : "8"}
-            rounded={"full"}
-            aria-label="Toggle Panel"
-            icon={isPanelVisible ? <FaChevronLeft /> : <FaChevronRight />}
-            onClick={() => setPanelVisible(!isPanelVisible)}
-          />
-        )}
-        <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          {/* <Image
-            h="100%"
-            w="100%"
-            objectFit="cover"
-            src="https://i.wpimg.pl/1424x936/filerepo.grupawp.pl/api/v1/display/embed/42799308-8932-4908-b3de-95c4bc048308"
-            alt="Europe map"
-          /> */}
-          <Flex justify="flex-end" pt="5rem">
-            <Flex
-              justifyContent="center"
-              w={isPanelVisible ? "70%" : "100%"}
-              h="100%"
-            >
-              <Box w="100%">
-                <Map
-                  lng={parkings[0].coordinates.lng}
-                  lat={parkings[0].coordinates.lat}
-                />
-              </Box>
-            </Flex>
-          </Flex>
-        </Box>
+    <Navbar />
+    <Box display="flex" height="calc(100dvh - 83px)">
+      {isLargerThanLG || isPanelVisible ? (
+        <Slide
+        style={{ position: "absolute", top: "83px", width: "25%", zIndex: 1 }}
+          direction="left"
+          in={true}
+        >
+          <SidePanel tab={tab} setTab={setTab} parkings={parkings} />
+        </Slide>
+      ) : null}
+      {!isLargerThanLG && (
+        <IconButton
+          zIndex={2}
+          display={{ base: "inherit", lg: "none" }}
+          position="absolute"
+          top={114}
+          left={isPanelVisible ? "260px" : "8"}
+          rounded={"full"}
+          bg={"white"}
+          boxShadow={"0 0 0 2px rgba(0,0,0,.1)"}
+          aria-label="Toggle Sidepanel"
+          icon={isPanelVisible ? <FaChevronLeft /> : <FaChevronRight />}
+          onClick={() => setPanelVisible(!isPanelVisible)}
+        />
+      )}
+      <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
+        <Map
+          lng={parkings[0].coordinates.lng}
+          lat={parkings[0].coordinates.lat}
+        />
       </Box>
-    </>
+    </Box>
+  </>
   );
 }
 
