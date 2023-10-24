@@ -31,7 +31,7 @@ interface SidePanelProps {
 const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
   return (
     <Box
-      minW="250px"
+      minW="230px"
       height="calc(100dvh - 83px)"
       p={5}
       borderRight="1px solid #A0AEC0"
