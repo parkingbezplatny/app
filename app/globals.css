@@ -15,7 +15,7 @@ body {
 .map-wrap {
   position: relative;
   height: calc(
-    100vh - 120px - 5rem
+    100vh - 83px - 2.5rem
   ); /* calculate height of the screen minus the heading */
 }
 
