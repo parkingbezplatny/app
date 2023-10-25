@@ -114,6 +114,7 @@ export async function getUserById(id: string): Promise<TUserDatabase> {
         isAdmin: true,
         isGoogle: true,
         username: true,
+        password: false,
         favoriteParkings: {
           select: {
             parking: true,
