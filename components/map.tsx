@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
 import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import MapTooltip from "./map-tooltip";
@@ -176,16 +177,18 @@ export default function Map({ lng, lat }: TMapProps) {
         }
 
         const popup = document.createElement("div");
-        ReactDOM.render(<MapTooltip name={"Parking u Miecia"} city={"Wrocław"} coordinates={"51.11, 17.0225"} />, popup);
-
+        ReactDOM.render(
+          <MapTooltip name={"Parking u Miecia"} city={"Wrocław"} coordinates={"51.11, 17.0225"} />,
+          popup
+        );
+        
         new maplibregl.Popup({
           closeButton: false,
         })
           .setLngLat(coordinates as LngLatLike)
           .setDOMContent(popup)
           .addTo(map.current as maplibregl.Map);
-      });
-
+        });
       // Change the cursor to a pointer when the mouse is over the places layer.
       map.current.on("mouseenter", "places", () => {
         if (!map.current) return;
