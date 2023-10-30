@@ -1,11 +1,20 @@
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import ReactDOM from "react-dom";
 
 type TMapProps = {
   lng: number;
   lat: number;
 };
+
+function Favorite() {
+  const favorite = () => {
+    alert("Favorite");
+  };
+
+  return <button onClick={favorite}>favorite</button>;
+}
 
 export default function Map({ lng, lat }: TMapProps) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -161,11 +170,15 @@ export default function Map({ lng, lat }: TMapProps) {
           coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
 
+        const placeholder = document.createElement("div");
+        ReactDOM.render(<Favorite />, placeholder);
+
         new maplibregl.Popup({
           closeButton: false,
         })
           .setLngLat(coordinates as LngLatLike)
-          .setHTML(description)
+          .setDOMContent(placeholder)
+          // .setHTML(description)
           .addTo(map.current as maplibregl.Map);
       });
 
