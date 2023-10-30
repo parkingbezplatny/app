@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
+import ReactDOM from "react-dom";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+import MapTooltip from "./map-tooltip";
 
 type TMapProps = {
   lng: number;
@@ -75,6 +78,17 @@ export default function Map({ lng, lat }: TMapProps) {
                 geometry: {
                   type: "Point",
                   coordinates: [lng + 0.0001, lat + 0.0001],
+                },
+              },
+              {
+                type: "Feature",
+                properties: {
+                  description:
+                    '<strong>Make it Mount Pleasant</strong><p><a href="http://www.mtpleasantdc.com/makeitmtpleasant" target="_blank" title="Opens in a new window">Make it Mount Pleasant</a> is a handmade and vintage market and afternoon of live entertainment and kids activities. 12:00-6:00 p.m.</p>',
+                },
+                geometry: {
+                  type: "Point",
+                  coordinates: [lng - 0.1, lat + 0.1],
                 },
               },
             ],
@@ -161,11 +175,14 @@ export default function Map({ lng, lat }: TMapProps) {
           coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
         }
 
+        const popup = document.createElement("div");
+        ReactDOM.render(<MapTooltip name={"Parking u Miecia"} city={"Wrocław"} coordinates={"51.11, 17.0225"} />, popup);
+
         new maplibregl.Popup({
           closeButton: false,
         })
           .setLngLat(coordinates as LngLatLike)
-          .setHTML(description)
+          .setDOMContent(popup)
           .addTo(map.current as maplibregl.Map);
       });
 
