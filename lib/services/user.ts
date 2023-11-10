@@ -1,7 +1,57 @@
+import { User } from "@prisma/client";
 import { getErrorMessage } from "../helpers/errorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
 import prisma from "../prisma/prismaClient";
 import { TUserDatabase, TUsersDatabase } from "../types";
+
+export async function canSignInWithCredential(
+  email: string | undefined,
+  password: string | undefined
+) {
+  try {
+    if (!email || !password) throw new Error("Nieprawidłowe dane logowania");
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) throw new Error("Nieprawidłowe dane logowania");
+    if (user.isGoogle)
+      throw new Error(
+        "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
+      );
+    if (!(await comparePassword(password, user.password)))
+      throw new Error("Nieprawidłowe dane logowania");
+
+    return user;
+  } catch (err: unknown) {
+    throw err;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function canCreateGoogleUser(email: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) return true;
+    if (!user.isGoogle)
+      throw new Error(
+        "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
+      );
+    return false;
+  } catch (err: unknown) {
+    throw err;
+  } finally {
+    prisma.$disconnect();
+  }
+}
 
 export async function createUser({
   email,
@@ -126,6 +176,35 @@ export async function getUserById(id: string): Promise<TUserDatabase> {
     if (!user) throw new Error("Nie znaleziono użytkownika");
 
     return user;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getUsersWithPagination(
+  skip: number,
+  take: number
+): Promise<Omit<User, "password">[]> {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
+      },
+      orderBy: { id: "asc" },
+      take: take,
+      skip: skip,
+    });
+
+    if (!users || users.length <= 0)
+      throw new Error("Nie znaleziono użytkowników");
+
+    return users;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {

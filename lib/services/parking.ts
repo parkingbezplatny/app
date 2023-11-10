@@ -1,3 +1,4 @@
+import { Parking } from "@prisma/client";
 import { getErrorMessage } from "../helpers/errorMessage";
 import prisma from "../prisma/prismaClient";
 import { TParkingDatabase, TParkingsDatabase } from "../types";
@@ -49,6 +50,28 @@ export async function getParkingById(id: string): Promise<TParkingDatabase> {
 
     if (!parking) throw new Error("Nie znaleziono parkingu");
     return parking;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function getParkingsWithPagination(
+  skip: number,
+  take: number
+): Promise<Parking[]> {
+  try {
+    const parkings = await prisma.parking.findMany({
+      orderBy: { id: "asc" },
+      take: take,
+      skip: skip,
+    });
+
+    if (!parkings || parkings.length <= 0)
+      throw new Error("Nie znaleziono parkingów");
+
+    return parkings;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {
