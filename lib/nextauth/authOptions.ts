@@ -1,7 +1,12 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { createGoogleUser, getUserByEmail } from "../services/user";
+import {
+  canCreateGoogleUser,
+  canSignInWithCredential,
+  createGoogleUser,
+  getUserByEmail,
+} from "../services/user";
 import prisma from "../prisma/prismaClient";
 import { comparePassword } from "../helpers/password";
 import { getErrorMessage } from "../helpers/errorMessage";
@@ -20,23 +25,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          if (!credentials?.email || !credentials.password)
-            throw new Error("Nieprawidłowe dane logowania");
-
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email,
-            },
-          });
-
-          if (!user) throw new Error("Nieprawidłowe dane logowania");
-          if (user.isGoogle)
-            throw new Error(
-              "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
-            );
-          if (!(await comparePassword(credentials.password, user.password)))
-            throw new Error("Nieprawidłowe dane logowania");
-
+          const user = await canSignInWithCredential(
+            credentials?.email,
+            credentials?.password
+          );
           return {
             id: user.id.toString(),
             email: user.email,
@@ -45,8 +37,6 @@ export const authOptions: NextAuthOptions = {
           };
         } catch (err: unknown) {
           throw new Error(encodeURI(getErrorMessage(err)));
-        } finally {
-          await prisma.$disconnect();
         }
       },
     }),
@@ -63,24 +53,14 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user: userSignIn, account }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
-        if (userSignIn) {
+        if (user) {
           try {
-            const user = await prisma.user.findUnique({
-              where: {
-                email: userSignIn.email,
-              },
-            });
-
-            if (!user) {
-              await createGoogleUser(userSignIn.email, userSignIn.name ?? "");
+            if (await canCreateGoogleUser(user.email)) {
+              await createGoogleUser(user.email, user.name ?? "");
               return true;
             }
-            if (!user.isGoogle)
-              throw new Error(
-                "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
-              );
           } catch (err: unknown) {
             throw new Error(encodeURI(getErrorMessage(err)));
           }
