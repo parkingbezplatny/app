@@ -1,19 +1,74 @@
-import { User } from "@prisma/client";
 import { getErrorMessage } from "../helpers/errorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
 import prisma from "../prisma/prismaClient";
-import { TUserDatabase, TUsersDatabase } from "../types";
+import {
+  TSignUpForm,
+  TUpdateUserPassword,
+  TUpdateUserUsername,
+  TUser,
+} from "../types";
 
-export async function canSignInWithCredential(
+export async function signInWithGoogle(
+  email: string,
+  username: string = ""
+): Promise<TUser> {
+  try {
+    const userExist = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
+      },
+    });
+
+    if (userExist) {
+      if (!userExist.isGoogle) {
+        throw new Error(
+          "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
+        );
+      } else {
+        return userExist;
+      }
+    } else {
+      const newUser = await prisma.user.create({
+        data: {
+          email: email,
+          password: "google",
+          username: username,
+          isAdmin: false,
+          isGoogle: true,
+        },
+        include: {
+          favoriteParkings: true,
+          parkingRatings: true,
+        },
+      });
+
+      return newUser;
+    }
+  } catch (err: unknown) {
+    throw err;
+  } finally {
+    prisma.$disconnect();
+  }
+}
+
+export async function signInWithCredential(
   email: string | undefined,
   password: string | undefined
-) {
+): Promise<TUser> {
   try {
     if (!email || !password) throw new Error("Nieprawidłowe dane logowania");
 
     const user = await prisma.user.findUnique({
       where: {
         email: email,
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
@@ -33,57 +88,33 @@ export async function canSignInWithCredential(
   }
 }
 
-export async function canCreateGoogleUser(email: string) {
+export async function signUpWithCreadential(user: TSignUpForm): Promise<TUser> {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-    if (!user) return true;
-    if (!user.isGoogle)
-      throw new Error(
-        "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
-      );
-    return false;
-  } catch (err: unknown) {
-    throw err;
-  } finally {
-    prisma.$disconnect();
-  }
-}
-
-export async function createUser({
-  email,
-  password,
-  username,
-}: {
-  email: string;
-  password: string;
-  username: string;
-}): Promise<TUserDatabase> {
-  try {
-    const user = await getUserByEmail(email);
-    if (user) {
-      if (user.isGoogle)
+    const userExist = await getUserByEmail(user.email);
+    if (userExist) {
+      if (userExist.isGoogle)
         throw new Error(
           "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
         );
       throw new Error("Użytkownik już istnieje");
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(user.passwords.password);
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
-        email: email,
+        email: user.email,
         password: hashedPassword,
+        username: user.username,
+        isAdmin: false,
         isGoogle: false,
-        username: username,
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
-    const newUser = await getUserByEmail(email);
     if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
 
     return newUser;
@@ -94,51 +125,15 @@ export async function createUser({
   }
 }
 
-export async function createGoogleUser(
-  email: string,
-  username: string
-): Promise<TUserDatabase> {
-  try {
-    // const user = await getUserByEmail(email);
-    // if (user) throw new Error("Użytkownik już istnieje");
-
-    await prisma.user.create({
-      data: {
-        email: email,
-        username: username,
-        password: "google",
-        isGoogle: true,
-      },
-    });
-
-    const newUser = await getUserByEmail(email);
-    if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
-
-    return newUser;
-  } catch (err: unknown) {
-    throw getErrorMessage(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-export async function getUserByEmail(email: string): Promise<TUserDatabase> {
+export async function getUserByEmail(userEmail: string): Promise<TUser> {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        email: email,
+        email: userEmail,
       },
-      select: {
-        email: true,
-        id: true,
-        isAdmin: true,
-        isGoogle: true,
-        username: true,
-        favoriteParkings: {
-          select: {
-            parking: true,
-          },
-        },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
@@ -152,24 +147,15 @@ export async function getUserByEmail(email: string): Promise<TUserDatabase> {
   }
 }
 
-export async function getUserById(id: string): Promise<TUserDatabase> {
+export async function getUserById(userId: string): Promise<TUser> {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: parseInt(id),
+        id: parseInt(userId),
       },
-      select: {
-        email: true,
-        id: true,
-        isAdmin: true,
-        isGoogle: true,
-        username: true,
-        password: false,
-        favoriteParkings: {
-          select: {
-            parking: true,
-          },
-        },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
@@ -186,16 +172,10 @@ export async function getUserById(id: string): Promise<TUserDatabase> {
 export async function getUsersWithPagination(
   skip: number,
   take: number
-): Promise<Omit<User, "password">[]> {
+): Promise<TUser[]> {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        email: true,
-        id: true,
-        isAdmin: true,
-        isGoogle: true,
-        username: true,
-      },
+      include: { parkingRatings: true, favoriteParkings: true },
       orderBy: { id: "asc" },
       take: take,
       skip: skip,
@@ -212,16 +192,12 @@ export async function getUsersWithPagination(
   }
 }
 
-export async function getUsers(): Promise<TUsersDatabase> {
+export async function getUsers(): Promise<TUser[]> {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        email: true,
-        id: true,
-        isAdmin: true,
-        isGoogle: true,
-        username: true,
-        favoriteParkings: { select: { parking: true } },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
       orderBy: { id: "asc" },
     });
@@ -237,29 +213,29 @@ export async function getUsers(): Promise<TUsersDatabase> {
   }
 }
 
-export async function updateUserByEmail({
-  email,
-  username,
-}: {
-  email: string;
-  username: string;
-}): Promise<TUserDatabase> {
+export async function updateUserByEmail(
+  userEmail: string,
+  updateUser: TUpdateUserUsername
+): Promise<TUser> {
   try {
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmail(userEmail);
     if (!user) throw new Error("Nie znaleziono użytkownika");
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       data: {
-        username: username,
+        username: updateUser.username,
       },
       where: {
-        email: email,
+        email: userEmail,
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
-    const updateUser = await getUserByEmail(email);
-    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
-    return updateUser;
+    if (!updatedUser) throw new Error("Błąd aktualizacji danych użytkownika");
+    return updatedUser;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {
@@ -267,29 +243,29 @@ export async function updateUserByEmail({
   }
 }
 
-export async function updateUserById({
-  id,
-  username,
-}: {
-  id: string;
-  username: string;
-}): Promise<TUserDatabase> {
+export async function updateUserById(
+  userId: string,
+  updateUser: TUpdateUserUsername
+): Promise<TUser> {
   try {
-    const user = await getUserById(id);
+    const user = await getUserById(userId);
     if (!user) throw new Error("Nie znaleziono użytkownika");
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       data: {
-        username: username,
+        username: updateUser.username,
       },
       where: {
-        id: parseInt(id),
+        id: parseInt(userId),
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
-    const updateUser = await getUserById(id);
-    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
-    return updateUser;
+    if (!updatedUser) throw new Error("Błąd aktualizacji danych użytkownika");
+    return updatedUser;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {
@@ -297,41 +273,43 @@ export async function updateUserById({
   }
 }
 
-export async function updateUserPasswordByEmail({
-  email,
-  oldPassword,
-  newPassword,
-}: {
-  email: string;
-  oldPassword: string;
-  newPassword: string;
-}): Promise<TUserDatabase> {
+export async function updateUserPasswordByEmail(
+  userEmail: string,
+  updateUser: TUpdateUserPassword
+): Promise<TUser> {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        email: email,
+        email: userEmail,
       },
     });
 
     if (!user) throw new Error("Nie znaleziono użytkownika");
-    if (!(await comparePassword(oldPassword, user.password)))
+    if (
+      !(await comparePassword(
+        updateUser.passwords.currentPassword,
+        user.password
+      ))
+    )
       throw new Error("Aktualne hasło jest nieprawidłowe");
 
-    const hashedPassword = await hashPassword(newPassword);
+    const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       data: {
         password: hashedPassword,
       },
       where: {
-        email: email,
+        email: userEmail,
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
-    const updateUser = await getUserByEmail(email);
-    if (!updateUser) throw new Error("Błąd zmiany hasła");
-
-    return updateUser;
+    if (!updatedUser) throw new Error("Błąd zmiany hasła");
+    return updatedUser;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {
@@ -339,41 +317,43 @@ export async function updateUserPasswordByEmail({
   }
 }
 
-export async function updateUserPasswordById({
-  id,
-  oldPassword,
-  newPassword,
-}: {
-  id: string;
-  oldPassword: string;
-  newPassword: string;
-}): Promise<TUserDatabase> {
+export async function updateUserPasswordById(
+  userId: string,
+  updateUser: TUpdateUserPassword
+): Promise<TUser> {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: parseInt(id),
+        id: parseInt(userId),
       },
     });
 
     if (!user) throw new Error("Nie znaleziono użytkownika");
-    if (!(await comparePassword(oldPassword, user.password)))
+    if (
+      !(await comparePassword(
+        updateUser.passwords.currentPassword,
+        user.password
+      ))
+    )
       throw new Error("Aktualne hasło jest nieprawidłowe");
 
-    const hashedPassword = await hashPassword(newPassword);
+    const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
 
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       data: {
         password: hashedPassword,
       },
       where: {
-        id: parseInt(id),
+        id: parseInt(userId),
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
       },
     });
 
-    const updateUser = await getUserById(id);
-    if (!updateUser) throw new Error("Błąd zmiany hasła");
-
-    return updateUser;
+    if (!updatedUser) throw new Error("Błąd zmiany hasła");
+    return updatedUser;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {
@@ -381,79 +361,82 @@ export async function updateUserPasswordById({
   }
 }
 
-export async function updateUserAdminByEmail(
-  email: string,
-  isAdmin: boolean
-): Promise<TUserDatabase> {
-  try {
-    const user = await getUserByEmail(email);
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+// TODO change admin role
+// export async function updateUserAdminByEmail(
+//   email: string,
+//   isAdmin: boolean
+// ): Promise<TUserDatabase> {
+//   try {
+//     const user = await getUserByEmail(email);
+//     if (!user) throw new Error("Nie znaleziono użytkownika");
 
-    await prisma.user.update({
-      data: {
-        isAdmin: isAdmin,
-      },
-      where: {
-        email: email,
-      },
-    });
+//     await prisma.user.update({
+//       data: {
+//         isAdmin: isAdmin,
+//       },
+//       where: {
+//         email: email,
+//       },
+//     });
 
-    const updateUser = await getUserByEmail(email);
-    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
+//     const updateUser = await getUserByEmail(email);
+//     if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
 
-    return updateUser;
-  } catch (err: unknown) {
-    throw getErrorMessage(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+//     return updateUser;
+//   } catch (err: unknown) {
+//     throw getErrorMessage(err);
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
 
-export async function updateUserAdminById(
-  id: string,
-  isAdmin: boolean
-): Promise<TUserDatabase> {
-  try {
-    const user = await getUserById(id);
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+// export async function updateUserAdminById(
+//   id: string,
+//   isAdmin: boolean
+// ): Promise<TUserDatabase> {
+//   try {
+//     const user = await getUserById(id);
+//     if (!user) throw new Error("Nie znaleziono użytkownika");
 
-    await prisma.user.update({
-      data: {
-        isAdmin: isAdmin,
-      },
-      where: {
-        id: parseInt(id),
-      },
-    });
+//     await prisma.user.update({
+//       data: {
+//         isAdmin: isAdmin,
+//       },
+//       where: {
+//         id: parseInt(id),
+//       },
+//     });
 
-    const updateUser = await getUserById(id);
-    if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
+//     const updateUser = await getUserById(id);
+//     if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
 
-    return updateUser;
-  } catch (err: unknown) {
-    throw getErrorMessage(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+//     return updateUser;
+//   } catch (err: unknown) {
+//     throw getErrorMessage(err);
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
 
-export async function deleteUserByEmail(email: string): Promise<void> {
-  try {
-    await prisma.user.delete({
-      where: { email: email },
-    });
-  } catch (err: unknown) {
-    throw getErrorMessage(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-export async function deleteUserById(id: string): Promise<void> {
+export async function deleteUserByEmail(userEmail: string): Promise<boolean> {
   try {
     await prisma.user.delete({
-      where: { id: parseInt(id) },
+      where: { email: userEmail },
     });
+    return true;
+  } catch (err: unknown) {
+    throw getErrorMessage(err);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function deleteUserById(userId: string): Promise<boolean> {
+  try {
+    await prisma.user.delete({
+      where: { id: parseInt(userId) },
+    });
+    return true;
   } catch (err: unknown) {
     throw getErrorMessage(err);
   } finally {

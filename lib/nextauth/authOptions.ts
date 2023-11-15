@@ -2,13 +2,10 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import {
-  canCreateGoogleUser,
-  canSignInWithCredential,
-  createGoogleUser,
   getUserByEmail,
+  signInWithCredential,
+  signInWithGoogle,
 } from "../services/user";
-import prisma from "../prisma/prismaClient";
-import { comparePassword } from "../helpers/password";
 import { getErrorMessage } from "../helpers/errorMessage";
 
 export const authOptions: NextAuthOptions = {
@@ -25,15 +22,14 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const user = await canSignInWithCredential(
+          const user = await signInWithCredential(
             credentials?.email,
             credentials?.password
           );
           return {
-            id: user.id.toString(),
-            email: user.email,
-            username: user.username,
-            isAdmin: user.isAdmin,
+            user: {
+              ...user,
+            },
           };
         } catch (err: unknown) {
           throw new Error(encodeURI(getErrorMessage(err)));
@@ -55,12 +51,10 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        if (user) {
+        if (user.user) {
           try {
-            if (await canCreateGoogleUser(user.email)) {
-              await createGoogleUser(user.email, user.name ?? "");
-              return true;
-            }
+            const u = await signInWithGoogle(user.email ?? "", user.name ?? "");
+            return u ? true : false;
           } catch (err: unknown) {
             throw new Error(encodeURI(getErrorMessage(err)));
           }
@@ -70,35 +64,22 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ user, token, account }) {
-      if (user) {
+      if (user.user) {
         if (account?.provider === "google") {
-          const userExists = await getUserByEmail(user.email);
+          const userExists = await getUserByEmail(user.user.email);
           if (!userExists) return token;
-          token.id = userExists.id.toString();
-          token.email = userExists.email;
-          token.username = userExists.username;
-          token.isAdmin = userExists.isAdmin;
-
+          token.user = { ...userExists };
           return token;
         }
-        token.id = user.id.toString();
-        token.email = user.email;
-        token.username = user.username;
-        token.isAdmin = user.isAdmin;
-
+        token.user = { ...user.user };
         return token;
       }
       return token;
     },
 
     async session({ session, token }) {
-      if (token) {
-        session.user = {
-          id: token.id,
-          email: token.email,
-          username: token.username,
-          isAdmin: token.isAdmin,
-        };
+      if (token.user) {
+        session.user = { ...token.user };
       }
       return session;
     },
