@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Box, IconButton, Text, Divider, HStack } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, IconButton, Text, HStack } from "@chakra-ui/react";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
-import { Address } from "@prisma/client";
-import { getParkingById } from "@/lib/services/parking";
 
 function MapTooltip({
   parkingId,
@@ -17,15 +15,6 @@ function MapTooltip({
     setIsFavourite(!isFavourite);
     alert(parkingId);
   };
-
-  useEffect(() => {
-    const fetch = async () => {
-      const p = await getParkingById(parkingId.toString());
-      console.log(p);
-    };
-
-    fetch();
-  }, []);
 
   return (
     <Box p={5} w="225px" position="relative">

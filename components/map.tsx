@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import MapTooltip from "./map-tooltip";
-import { getParkingsForMap } from "../lib/services/parking";
 
 type TMapProps = {
   lng: number;
@@ -58,7 +57,6 @@ export default function Map({ lng, lat }: TMapProps) {
           // example data TODO fetch from API
           data: {
             type: "FeatureCollection",
-            features: [...(await getParkingsForMap())],
           },
           cluster: true,
           clusterMaxZoom: 14, // Max zoom to cluster points on
