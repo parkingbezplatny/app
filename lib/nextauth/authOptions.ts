@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        if (user.user) {
+        if (user) {
           try {
             const u = await signInWithGoogle(user.email ?? "", user.name ?? "");
             return u ? true : false;
@@ -64,9 +64,9 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ user, token, account }) {
-      if (user.user) {
+      if (user) {
         if (account?.provider === "google") {
-          const userExists = await getUserByEmail(user.user.email);
+          const userExists = await getUserByEmail(user.email as string);
           if (!userExists) return token;
           token.user = { ...userExists };
           return token;
@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      if (token.user) {
+      if (token) {
         session.user = { ...token.user };
       }
       return session;

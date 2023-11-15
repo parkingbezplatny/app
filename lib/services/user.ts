@@ -9,7 +9,7 @@ import {
 } from "../types";
 
 export async function signInWithGoogle(
-  email: string,
+  email: string = "",
   username: string = ""
 ): Promise<TUser> {
   try {
@@ -17,7 +17,12 @@ export async function signInWithGoogle(
       where: {
         email: email,
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -40,7 +45,12 @@ export async function signInWithGoogle(
           isAdmin: false,
           isGoogle: true,
         },
-        include: {
+        select: {
+          email: true,
+          id: true,
+          isAdmin: true,
+          isGoogle: true,
+          username: true,
           favoriteParkings: true,
           parkingRatings: true,
         },
@@ -80,7 +90,8 @@ export async function signInWithCredential(
     if (!(await comparePassword(password, user.password)))
       throw new Error("Nieprawidłowe dane logowania");
 
-    return user;
+    const u = await getUserByEmail(email);
+    return u;
   } catch (err: unknown) {
     throw err;
   } finally {
@@ -109,7 +120,12 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<TUser> {
         isAdmin: false,
         isGoogle: false,
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -131,7 +147,12 @@ export async function getUserByEmail(userEmail: string): Promise<TUser> {
       where: {
         email: userEmail,
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -153,7 +174,12 @@ export async function getUserById(userId: string): Promise<TUser> {
       where: {
         id: parseInt(userId),
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -175,7 +201,15 @@ export async function getUsersWithPagination(
 ): Promise<TUser[]> {
   try {
     const users = await prisma.user.findMany({
-      include: { parkingRatings: true, favoriteParkings: true },
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
+        parkingRatings: true,
+        favoriteParkings: true,
+      },
       orderBy: { id: "asc" },
       take: take,
       skip: skip,
@@ -195,7 +229,12 @@ export async function getUsersWithPagination(
 export async function getUsers(): Promise<TUser[]> {
   try {
     const users = await prisma.user.findMany({
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -228,7 +267,12 @@ export async function updateUserByEmail(
       where: {
         email: userEmail,
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -258,7 +302,12 @@ export async function updateUserById(
       where: {
         id: parseInt(userId),
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -302,7 +351,12 @@ export async function updateUserPasswordByEmail(
       where: {
         email: userEmail,
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
@@ -346,7 +400,12 @@ export async function updateUserPasswordById(
       where: {
         id: parseInt(userId),
       },
-      include: {
+      select: {
+        email: true,
+        id: true,
+        isAdmin: true,
+        isGoogle: true,
+        username: true,
         favoriteParkings: true,
         parkingRatings: true,
       },
