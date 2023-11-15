@@ -17,7 +17,9 @@ async function main() {
     for (let i = 4801; i < parkingList.length - 1; i++) {
       console.log(`Fetching number ${i}`);
       const response = await axios.get(
-        `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${parkingList[i].lat}%2C${parkingList[i].lng}&lang=pl-PL&apiKey=${process.env.NEXT_PUBLIC_HERE_API_KEY}`
+        // TODO add to Vercel env new entry
+        `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${parkingList[i].lat}%2C${parkingList[i].lng}&lang=pl-PL&apiKey=12345`
+        // `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${parkingList[i].lat}%2C${parkingList[i].lng}&lang=pl-PL&apiKey=${process.env.NEXT_PUBLIC_HERE_API_KEY}`
       );
       if (response.data && response.data.items.length > 0) {
         const p = response.data.items[0];
