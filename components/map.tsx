@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
-import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import MapTooltip from "./map-tooltip";
+import { getParkingsForMap } from "../lib/services/parking";
 
 type TMapProps = {
   lng: number;
@@ -32,7 +32,7 @@ export default function Map({ lng, lat }: TMapProps) {
       if (!map.current) return;
 
       // Load custom marker for map
-      map.current.loadImage("marker.png", (error, image) => {
+      map.current.loadImage("marker.png", async (error, image) => {
         if (error) throw error;
         if (!map.current) return;
 
@@ -58,41 +58,7 @@ export default function Map({ lng, lat }: TMapProps) {
           // example data TODO fetch from API
           data: {
             type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                properties: {
-                  description:
-                    '<strong>Make it Mount Pleasant</strong><p><a href="http://www.mtpleasantdc.com/makeitmtpleasant" target="_blank" title="Opens in a new window">Make it Mount Pleasant</a> is a handmade and vintage market and afternoon of live entertainment and kids activities. 12:00-6:00 p.m.</p>',
-                },
-                geometry: {
-                  type: "Point",
-                  coordinates: [lng, lat],
-                },
-              },
-              {
-                type: "Feature",
-                properties: {
-                  description:
-                    '<strong>Make it Mount Pleasant</strong><p><a href="http://www.mtpleasantdc.com/makeitmtpleasant" target="_blank" title="Opens in a new window">Make it Mount Pleasant</a> is a handmade and vintage market and afternoon of live entertainment and kids activities. 12:00-6:00 p.m.</p>',
-                },
-                geometry: {
-                  type: "Point",
-                  coordinates: [lng + 0.0001, lat + 0.0001],
-                },
-              },
-              {
-                type: "Feature",
-                properties: {
-                  description:
-                    '<strong>Make it Mount Pleasant</strong><p><a href="http://www.mtpleasantdc.com/makeitmtpleasant" target="_blank" title="Opens in a new window">Make it Mount Pleasant</a> is a handmade and vintage market and afternoon of live entertainment and kids activities. 12:00-6:00 p.m.</p>',
-                },
-                geometry: {
-                  type: "Point",
-                  coordinates: [lng - 0.1, lat + 0.1],
-                },
-              },
-            ],
+            features: [...(await getParkingsForMap())],
           },
           cluster: true,
           clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -160,14 +126,16 @@ export default function Map({ lng, lat }: TMapProps) {
 
       // When a click event occurs on a feature in the places layer, open a popup at the
       // location of the feature, with description HTML from its properties.
-      map.current.on("click", "places", (e) => {
+      map.current.on("click", "places", async (e) => {
         // Chcek if e.features exists
         if (!e.features) return;
 
         // Check geometry type must be "Point"
         if (e.features[0].geometry.type !== "Point") return;
+        const id = e.features[0].id as number;
         const coordinates = e.features[0].geometry.coordinates.slice();
-        const description = e.features[0].properties.description;
+        const address = await JSON.parse(e.features[0].properties.address);
+        const label = address.label as string;
 
         // Ensure that if the map is zoomed out such that multiple
         // copies of the feature are visible, the popup appears
@@ -178,11 +146,7 @@ export default function Map({ lng, lat }: TMapProps) {
 
         const popup = document.createElement("div");
         createRoot(popup).render(
-          <MapTooltip
-            name={"Parking u Miecia"}
-            city={"Wrocław"}
-            coordinates={"51.11, 17.0225"}
-          />
+          <MapTooltip parkingId={id} parkingLabel={label} />
         );
 
         new maplibregl.Popup({
