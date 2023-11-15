@@ -21,26 +21,55 @@ model User {
 
 model FavoriteParkingAndUser {
   id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  parking   Parking @relation(fields: [parkingId], references: [id])
+  parking   Parking @relation(fields: [parkingId], references: [id], onDelete: Cascade)
   parkingId Int
 }
 
 model RatingParkingAndUser {
   id        Int     @id @default(autoincrement())
   rating    Int
-  user      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  parking   Parking @relation(fields: [parkingId], references: [id])
+  parking   Parking @relation(fields: [parkingId], references: [id], onDelete: Cascade)
   parkingId Int
 }
 
 model Parking {
   id            Int                      @id @default(autoincrement())
-  lat           Float
-  lng           Float
-  place         String
+  type          String
   favoriteUsers FavoriteParkingAndUser[]
   userRatings   RatingParkingAndUser[]
+  properties    Properties?
+  geometry      Geometry?
+}
+
+model Geometry {
+  id          Int     @id @default(autoincrement())
+  type        String
+  coordinates Float[]
+  parkingId   Int     @unique
+  parking     Parking @relation(fields: [parkingId], references: [id], onDelete: Cascade)
+}
+
+model Properties {
+  id        Int      @id @default(autoincrement())
+  address   Address?
+  parkingId Int      @unique
+  parking   Parking  @relation(fields: [parkingId], references: [id], onDelete: Cascade)
+}
+
+model Address {
+  id           Int        @id @default(autoincrement())
+  propertiesId Int        @unique
+  properties   Properties @relation(fields: [propertiesId], references: [id], onDelete: Cascade)
+  label        String
+  countryName  String
+  state        String
+  county       String
+  city         String
+  street       String?
+  postalCode   String
+  houseNumber  String?
 }
