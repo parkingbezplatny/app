@@ -30,12 +30,6 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
             />
           </FormControl>
           <FormControl>
-            <FormLabel mt={4}>Powtórz nową nazwę użytkownika</FormLabel>
-            <Input
-              focusBorderColor="orange.400"
-              placeholder="Powtórz nazwę użytkownika"
-            />
-          </FormControl>
         </ModalBody>
         <ModalFooter>
           <Button
