@@ -5,5 +5,8 @@
     "prettier",
     "plugin:testing-library/react",
     "plugin:jest-dom/recommended"
-  ]
+  ],
+  "rules": {
+    "@typescript-eslint/ban-ts-ignore": "off"
+  }
 }

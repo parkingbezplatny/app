@@ -17,7 +17,11 @@ export async function createParking(
         ...parking,
         geometry: {
           create: {
-            ...parking.geometry,
+            coordinates: [
+              parseFloat(parking.geometry.lat),
+              parseFloat(parking.geometry.lng),
+            ],
+            type: parking.geometry.type,
           },
         },
         properties: {
@@ -217,7 +221,10 @@ export async function updateParkingById(
         geometry: {
           update: {
             data: {
-              coordinates: updateParking.geometry.coordinates,
+              coordinates: [
+                parseFloat(updateParking.geometry.lat),
+                parseFloat(updateParking.geometry.lng),
+              ],
             },
           },
         },
