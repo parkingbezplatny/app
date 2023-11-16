@@ -15,6 +15,11 @@ import { CreateParkingValidation } from "../validations/forms/createParking.vali
 import { UpdateUserUsernameValidation } from "../validations/forms/updateUserUsername.validation";
 import { UpdateUserPasswordValidation } from "../validations/forms/updateUserPassword.validation";
 
+export type TModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
 export type TUser = {
   favoriteParkings: FavoriteParkingAndUser[] | null;
   parkingRatings: RatingParkingAndUser[] | null;
