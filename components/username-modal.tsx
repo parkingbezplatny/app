@@ -12,7 +12,9 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-export default function UsernameModal({ isOpen, onClose }) {
+import { TModalProps } from "@/lib/types";
+
+export default function UsernameModal({ isOpen, onClose }: TModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
