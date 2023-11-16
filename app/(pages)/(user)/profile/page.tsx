@@ -13,20 +13,20 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
+import { useSession } from "next-auth/react";
+
 
 import Navbar from "@/components/navbar";
 import UsernameModal from "@/components/username-modal";
 import PasswordModal from "@/components/password-modal";
 
 export default function Profile() {
+  const { data: session } = useSession();
+  
   const columns = useBreakpointValue({ base: 1, md: 2, lg: 3 });
 
   const usernameModal = useDisclosure();
   const passwordModal = useDisclosure();
-  
-  const [user, setUser] = useState({
-    name: "Spongebob",
-  });
 
   const parkings = [
     {
@@ -106,7 +106,7 @@ export default function Profile() {
         alignItems="center"
       >
         <Avatar
-          name={user.name}
+          name={session?.user?.username}
           bg="white"
           color="black"
           shadow="lg"
@@ -116,7 +116,7 @@ export default function Profile() {
           my={4}
         />
         <Heading size="md" mb={6}>
-          {user.name}
+        {session?.user?.username}
         </Heading>
         <Flex mb={4}>
           <Button
