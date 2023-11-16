@@ -2,10 +2,12 @@ import * as z from "zod";
 
 export const UpdateParkingValidation = z.object({
   geometry: z.object({
-    coordinates: z
-      .number({ required_error: "Koordynaty są wymagane" })
-      .array()
-      .length(2),
+    lat: z
+      .string({ required_error: "Lat jest wymagane" })
+      .min(1, { message: "Lat nie może być pusty" }),
+    lng: z
+      .string({ required_error: "Lng jest wymagane" })
+      .min(1, { message: "Lng nie może być pusty" }),
   }),
   properties: z.object({
     address: z.object({
