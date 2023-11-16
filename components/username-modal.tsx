@@ -29,7 +29,6 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
               placeholder="Nazwa użytkownika"
             />
           </FormControl>
-          <FormControl>
         </ModalBody>
         <ModalFooter>
           <Button
