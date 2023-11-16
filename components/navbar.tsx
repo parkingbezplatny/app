@@ -36,7 +36,7 @@ const Navbar = () => {
     >
       <Link href="/dashboard">
         <Flex align="center">
-          <Image boxSize={42} mr={2} src="logo.png" alt="" />
+          <Image boxSize={42} mr={2} src="/logo.png" alt="" />
           <Text fontSize="lg" fontWeight="bold">
             PARKING
           </Text>
