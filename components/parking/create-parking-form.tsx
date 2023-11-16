@@ -230,7 +230,11 @@ function CreateParkingForm() {
               })}
             />
             <FormErrorMessage>
-              {errors.geometry?.type?.message}
+              {
+                // eslint-disable-next-line
+                // @ts-ignore
+                errors.geometry?.type?.message
+              }
             </FormErrorMessage>
           </FormControl>
 
