@@ -81,6 +81,11 @@ const Navbar = () => {
               />
             </MenuButton>
             <MenuList>
+              {session?.user?.isAdmin && (
+                <Link href="/admin">
+                  <MenuItem>Administrator</MenuItem>
+                </Link>
+              )}
               <Link href="/profile">
                 <MenuItem>Profil</MenuItem>
               </Link>
@@ -106,6 +111,22 @@ const Navbar = () => {
             <Text mb={4} fontSize={"sm"} fontWeight={"bold"}>
               {session?.user?.username}
             </Text>
+
+            {session?.user?.isAdmin && (
+              <Button
+                as={Link}
+                href="/admin"
+                size="sm"
+                bg="orange.400"
+                _hover={{
+                  bg: "orange.500",
+                }}
+                textColor="white"
+                w={"full"}
+              >
+                Administrator
+              </Button>
+            )}
             <Button
               as={Link}
               href="/profile"
