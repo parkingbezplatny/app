@@ -14,17 +14,17 @@ import { useRef } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 
 type Props = {
-  parkingId: number;
+  userId: number;
 };
 
-function DeleteParkingModal({ parkingId }: Props) {
+function DeleteUserModal({ userId }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const initialRef = useRef(null);
 
-  const deleteParking = async () => {
+  const deleteUser = async () => {
     //TODO call to API for delete
-    alert(parkingId);
+    alert(userId);
     onClose();
   };
   return (
@@ -36,13 +36,13 @@ function DeleteParkingModal({ parkingId }: Props) {
       <Modal initialFocusRef={initialRef} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Usuń parking</ModalHeader>
+          <ModalHeader>Usuń użytkownika</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Flex direction="column" gap="1rem">
-              <Text>Czy napewno chcesz usunąć parking?</Text>
+              <Text>Czy napewno chcesz usunąć użytkownika?</Text>
               <Flex direction="row" justify="space-between">
-                <Button onClick={onClose} variant="ghost" w="100px" size="md">
+                <Button onClick={onClose} w="100px" size="md" variant="ghost">
                   Anuluj
                 </Button>
                 <Button
@@ -53,7 +53,7 @@ function DeleteParkingModal({ parkingId }: Props) {
                   _hover={{
                     bg: "orange.600",
                   }}
-                  onClick={deleteParking}
+                  onClick={deleteUser}
                 >
                   Tak
                 </Button>
@@ -66,4 +66,4 @@ function DeleteParkingModal({ parkingId }: Props) {
   );
 }
 
-export default DeleteParkingModal;
+export default DeleteUserModal;

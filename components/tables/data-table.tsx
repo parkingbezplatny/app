@@ -5,10 +5,16 @@ import {
   Button,
   Flex,
   Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -25,11 +31,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  type: "parking" | "user";
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  type,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -42,20 +50,32 @@ export function DataTable<TData, TValue>({
   return (
     <>
       <Flex direction="column" gap="1rem">
-        <Input
-          maxW="300px"
-          placeholder="Szukaj po miejscowości..."
-          value={
-            (table
-              .getColumn("properties_address.label")
-              ?.getFilterValue() as string) ?? ""
-          }
-          onChange={(e) =>
-            table
-              .getColumn("properties_address.label")
-              ?.setFilterValue(e.target.value)
-          }
-        />
+        {type === "parking" && (
+          <Input
+            maxW="300px"
+            placeholder="Szukaj po miejscowości..."
+            value={
+              (table
+                .getColumn("properties_address.label")
+                ?.getFilterValue() as string) ?? ""
+            }
+            onChange={(e) =>
+              table
+                .getColumn("properties_address.label")
+                ?.setFilterValue(e.target.value)
+            }
+          />
+        )}
+        {type === "user" && (
+          <Input
+            maxW="300px"
+            placeholder="Szukaj po email..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(e) =>
+              table.getColumn("email")?.setFilterValue(e.target.value)
+            }
+          />
+        )}
         <Table variant="simple" border="1px solid #e4e4e7" boxShadow="lg">
           <Thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -96,33 +116,52 @@ export function DataTable<TData, TValue>({
             )}
           </Tbody>
         </Table>
-        <Flex direction="row" w="100%" justify="flex-end" gap="1rem" mb="1rem">
-          <Button
-            bg="orange.400"
-            _hover={{
-              bg: "#DD6B20",
-            }}
-            textColor="white"
-            w="100px"
-            size="sm"
-            onClick={() => table.previousPage()}
-            isDisabled={!table.getCanPreviousPage()}
-          >
-            Wstecz
-          </Button>
-          <Button
-            bg="orange.400"
-            _hover={{
-              bg: "#DD6B20",
-            }}
-            textColor="white"
-            w="100px"
-            size="sm"
-            onClick={() => table.nextPage()}
-            isDisabled={!table.getCanNextPage()}
-          >
-            Dalej
-          </Button>
+        <Flex
+          align="center"
+          direction="row"
+          w="100%"
+          justify="space-between"
+          mb="1rem"
+          gap="1rem"
+          p="1rem"
+        >
+          <Flex direction="row" gap="1rem" align="center">
+            <Text>
+              {table.getState().pagination.pageIndex + 1} z{" "}
+              {table.getPageCount()}
+            </Text>
+            <NumberInput
+              onChange={(e) => {
+                if (parseInt(e) >= 0) table.setPageIndex(parseInt(e) - 1);
+                else table.setPageIndex(0);
+              }}
+              min={1}
+              max={table.getPageCount()}
+            >
+              <NumberInputField placeholder="Wpisz numer strony..." />
+            </NumberInput>
+          </Flex>
+
+          <Flex direction="row" justify="flex-end" gap="1rem" mb="1rem">
+            <Button
+              variant="ghost"
+              w="100px"
+              size="sm"
+              onClick={() => table.previousPage()}
+              isDisabled={!table.getCanPreviousPage()}
+            >
+              Wstecz
+            </Button>
+            <Button
+              variant="ghost"
+              w="100px"
+              size="sm"
+              onClick={() => table.nextPage()}
+              isDisabled={!table.getCanNextPage()}
+            >
+              Dalej
+            </Button>
+          </Flex>
         </Flex>
       </Flex>
     </>

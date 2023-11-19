@@ -26,7 +26,7 @@ function AdminParking() {
         <Heading>Zarządzasz parkingami</Heading>
         <CreateParkingModal />
       </Flex>
-      <DataTable columns={parkingColumns} data={parkings} />
+      <DataTable columns={parkingColumns} data={parkings} type={"parking"} />
     </Flex>
   );
 }
