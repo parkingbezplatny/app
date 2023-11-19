@@ -42,26 +42,17 @@ function DeleteParkingModal({ parkingId }: Props) {
             <Flex direction="column" gap="1rem">
               <Text>Czy napewno chcesz usunąć parking?</Text>
               <Flex direction="row" justify="space-between">
-                <Button
-                  onClick={onOpen}
-                  bg="green.400"
-                  _hover={{
-                    bg: "#DD6B20",
-                  }}
-                  textColor="white"
-                  w="100px"
-                  size="md"
-                >
+                <Button onClick={onClose} variant="ghost" w="100px" size="md">
                   Anuluj
                 </Button>
                 <Button
-                  bg="red.400"
-                  _hover={{
-                    bg: "#DD6B20",
-                  }}
                   textColor="white"
                   w="100px"
                   size="md"
+                  bg="orange.500"
+                  _hover={{
+                    bg: "orange.600",
+                  }}
                   onClick={deleteParking}
                 >
                   Tak
