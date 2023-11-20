@@ -1,4 +1,5 @@
 import { getErrorMessage } from "../helpers/errorMessage";
+import { ErrorServerFunctionResponse, ServerFunctionResponse, SuccessServerFunctionResponse } from "../helpers/server-function-response";
 import prisma from "../prisma/prismaClient";
 import {
   TCreateParking,
@@ -10,7 +11,7 @@ import { getUserById } from "./user";
 
 export async function createParking(
   parking: TCreateParking
-): Promise<TParking> {
+): Promise<ServerFunctionResponse<TParking | null>> {
   try {
     const newParking = await prisma.parking.create({
       data: {
@@ -46,15 +47,15 @@ export async function createParking(
       },
     });
 
-    return newParking;
+    return new SuccessServerFunctionResponse<TParking>("Pomyślnie dodano parking", newParking);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getParkingById(id: string): Promise<TParking> {
+export async function getParkingById(id: string): Promise<ServerFunctionResponse<TParking | null>> {
   try {
     const parking = await prisma.parking.findUnique({
       include: {
@@ -72,16 +73,18 @@ export async function getParkingById(id: string): Promise<TParking> {
       },
     });
 
-    if (!parking) throw new Error("Nie znaleziono parkingu");
-    return parking;
-  } catch (err: unknown) {
-    throw getErrorMessage(err);
+    if (!parking) {
+      return new ErrorServerFunctionResponse("Nie znalezniono parkingu");
+    }
+    return new SuccessServerFunctionResponse<TParking>("Znaleziono parking", parking);
+  } catch (err) {
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getParkingsForMap(): Promise<TParkingMap[]> {
+export async function getParkingsForMap(): Promise<ServerFunctionResponse<TParkingMap[] | null>> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -103,12 +106,13 @@ export async function getParkingsForMap(): Promise<TParkingMap[]> {
       },
     });
 
-    if (!parkings || parkings.length <= 0)
-      throw new Error("Nie znaleziono parkingów");
+    if (!parkings || parkings.length <= 0) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
+    }
 
-    return parkings;
+    return new SuccessServerFunctionResponse<TParkingMap[]>("Znaleziono parkingi", parkings);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -117,7 +121,7 @@ export async function getParkingsForMap(): Promise<TParkingMap[]> {
 export async function getParkingsWithPagination(
   skip: number,
   take: number
-): Promise<TParking[]> {
+): Promise<ServerFunctionResponse<TParking[] | null>> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -135,18 +139,19 @@ export async function getParkingsWithPagination(
       skip: skip,
     });
 
-    if (!parkings || parkings.length <= 0)
-      throw new Error("Nie znaleziono parkingów");
+    if (!parkings || parkings.length <= 0) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
+    }
 
-    return parkings;
+    return new SuccessServerFunctionResponse<TParking[]>("Znaleziono parkingi", parkings);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getParkingsByCity(city: string): Promise<TParking[]> {
+export async function getParkingsByCity(city: string): Promise<ServerFunctionResponse<TParking[] | null>> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -171,18 +176,19 @@ export async function getParkingsByCity(city: string): Promise<TParking[]> {
       },
     });
 
-    if (!parkings || parkings.length <= 0)
-      throw new Error("Nie znaleziono parkingów");
+    if (!parkings || parkings.length <= 0) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
+    }
 
-    return parkings;
+    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getParkings(): Promise<TParking[]> {
+export async function getParkings(): Promise<ServerFunctionResponse<TParking[] | null>> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -198,11 +204,13 @@ export async function getParkings(): Promise<TParking[]> {
     });
 
     if (!parkings || parkings.length <= 0)
-      throw new Error("Nie znaleziono parkingów");
+    {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
+    }
 
-    return parkings;
+    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);;
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -211,10 +219,12 @@ export async function getParkings(): Promise<TParking[]> {
 export async function updateParkingById(
   parkingId: string,
   updateParking: TUpdateParking
-): Promise<TParking> {
+): Promise<ServerFunctionResponse<TParking | null>> {
   try {
-    const parking = await getParkingById(parkingId);
-    if (!parking) throw new Error("Nie znaleziono parkingu");
+    const parking = (await getParkingById(parkingId)).data;
+    if (!parking) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
+    }
 
     const updatedParking = await prisma.parking.update({
       data: {
@@ -251,20 +261,26 @@ export async function updateParkingById(
       },
     });
 
-    if (!updatedParking) throw new Error("Błąd aktualizacji danych parkingu");
+    if (!updatedParking) 
+    {
+      return new ErrorServerFunctionResponse("Błąd aktualizacji danych parkingu");
+    }
 
-    return updatedParking;
+    return new SuccessServerFunctionResponse("Pomyślnie zaktualizowano dane parkingu", updatedParking);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function deleteParkingById(parkingId: string): Promise<boolean> {
+export async function deleteParkingById(parkingId: string): Promise<ServerFunctionResponse<null>> {
   try {
-    const parking = await getParkingById(parkingId);
-    if (!parking) throw new Error("Nie znaleziono parkingu");
+    const parking = (await getParkingById(parkingId)).data;
+    if (!parking) 
+    {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
+    }
 
     await prisma.parking.delete({
       where: {
@@ -272,9 +288,9 @@ export async function deleteParkingById(parkingId: string): Promise<boolean> {
       },
     });
 
-    return true;
+    return new SuccessServerFunctionResponse("Pomyślnie usunięto parking", null);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -284,13 +300,18 @@ export async function rateParkingById(
   parkingId: string,
   userId: string,
   rating: string
-): Promise<TParking> {
+): Promise<ServerFunctionResponse<TParking | null>> {
   try {
-    const parking = await getParkingById(parkingId);
-    const user = await getUserById(userId);
+    const parking = (await getParkingById(parkingId)).data;
+    const user = (await getUserById(userId)).data; 
 
-    if (!parking || !user)
-      throw new Error("Nie znaleziono użytkownika lub parkingu");
+    if (!parking) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
+    }
+
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
     const ratedParkingByUser = await prisma.ratingParkingAndUser.findFirst({
       where: {
@@ -324,11 +345,15 @@ export async function rateParkingById(
       });
     }
 
-    const rateParking = await getParkingById(parkingId);
-    if (!rateParking) throw new Error("Błąd oceniania parkingu");
-    return rateParking;
+    const rateParking = (await getParkingById(parkingId)).data;
+    if (!rateParking)
+    {
+      return new ErrorServerFunctionResponse("Błąd oceniania parkingu");
+    }
+
+    return new SuccessServerFunctionResponse("Pomyślnie oceniono parking", rateParking);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -337,13 +362,18 @@ export async function rateParkingById(
 export async function addToFavoriteParkingById(
   parkingId: string,
   userId: string
-): Promise<TParking> {
+): Promise<ServerFunctionResponse<TParking | null>> {
   try {
-    const parking = await getParkingById(parkingId);
-    const user = await getUserById(userId);
+    const parking = (await getParkingById(parkingId)).data;
+    const user = (await getUserById(userId)).data; 
 
-    if (!parking || !user)
-      throw new Error("Nie znaleziono użytkownika lub parkingu");
+    if (!parking) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
+    }
+
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
     const favoredParkingByUser = await prisma.favoriteParkingAndUser.findFirst({
       where: {
@@ -358,7 +388,10 @@ export async function addToFavoriteParkingById(
       },
     });
 
-    if (favoredParkingByUser) throw new Error("Parking już jest w ulubionych");
+    if (favoredParkingByUser) 
+    {
+      return new ErrorServerFunctionResponse("Parking już jest w ulubionych");
+    }
 
     await prisma.favoriteParkingAndUser.create({
       data: {
@@ -367,12 +400,14 @@ export async function addToFavoriteParkingById(
       },
     });
 
-    const favoriteParking = await getParkingById(parkingId);
-    if (!favoriteParking)
-      throw new Error("Błąd dodawania parkingu do ulubionych");
-    return favoriteParking;
+    const favoriteParking = (await getParkingById(parkingId)).data;
+    if (!favoriteParking) {
+      return new ErrorServerFunctionResponse("Błąd dodawania parkingu do ulubionych");
+    }
+
+    return new SuccessServerFunctionResponse("Pomyślnie dodano parking do ulubionych", favoriteParking);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -381,13 +416,18 @@ export async function addToFavoriteParkingById(
 export async function removeFromFavoriteParkingById(
   parkingId: string,
   userId: string
-): Promise<boolean> {
+): Promise<ServerFunctionResponse<null>> {
   try {
-    const parking = await getParkingById(parkingId);
-    const user = await getUserById(userId);
+    const parking = (await getParkingById(parkingId)).data;
+    const user = (await getUserById(userId)).data; 
 
-    if (!parking || !user)
-      throw new Error("Nie znaleziono użytkownika lub parkingu");
+    if (!parking) {
+      return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
+    }
+
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
     const favoredParkingByUser = await prisma.favoriteParkingAndUser.findFirst({
       where: {
@@ -402,16 +442,20 @@ export async function removeFromFavoriteParkingById(
       },
     });
 
-    if (!favoredParkingByUser) throw new Error("Parking nie jest w ulubionych");
+    if (!favoredParkingByUser) 
+    {
+      return new ErrorServerFunctionResponse("Parking nie jest w ulubionych");
+    }
 
     await prisma.favoriteParkingAndUser.delete({
       where: {
         id: favoredParkingByUser.id,
       },
     });
-    return true;
+
+    return new SuccessServerFunctionResponse("Pomyślnie usunięto parking z ulubionych", null); 
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ErrorServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
