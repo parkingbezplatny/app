@@ -23,3 +23,5 @@ export class ErrorServerFunctionResponse extends ServerFunctionResponse<null> {
     super(false, message, null);
   }
 }
+
+export class ExceptionServerFunctionResponse extends ErrorServerFunctionResponse {}

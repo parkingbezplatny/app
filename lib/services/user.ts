@@ -1,6 +1,6 @@
 import { getErrorMessage } from "../helpers/errorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
-import { ErrorServerFunctionResponse, ServerFunctionResponse, SuccessServerFunctionResponse } from "../helpers/server-function-response";
+import { ErrorServerFunctionResponse, ExceptionServerFunctionResponse, ServerFunctionResponse, SuccessServerFunctionResponse } from "../helpers/server-function-response";
 import prisma from "../prisma/prismaClient";
 import {
   TSignUpForm,
@@ -58,7 +58,7 @@ export async function signInWithGoogle(
       return new SuccessServerFunctionResponse("Utworzono nowe konto użytkownika", newUser);
     }
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     prisma.$disconnect();
   }
@@ -98,7 +98,7 @@ export async function signInWithCredential(
     const u = (await getUserByEmail(email)).data;
     return new SuccessServerFunctionResponse("Zalogowano pomyślnie", u);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -143,7 +143,7 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFu
 
     return new SuccessServerFunctionResponse("Utworzono nowe konto użytkownika", newUser);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -173,7 +173,7 @@ export async function getUserByEmail(userEmail: string): Promise<ServerFunctionR
 
     return new SuccessServerFunctionResponse("Znaleziono użytkownika", user);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -203,7 +203,7 @@ export async function getUserById(userId: string): Promise<ServerFunctionRespons
 
     return new SuccessServerFunctionResponse("Znaleziono użytkownika", user);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -235,7 +235,7 @@ export async function getUsersWithPagination(
 
     return new SuccessServerFunctionResponse("Znaleziono użytkowników", users);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -263,7 +263,7 @@ export async function getUsers(): Promise<ServerFunctionResponse<TUser[] | null>
 
     return new SuccessServerFunctionResponse("Znaleziono użytkowników", users);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err)); 
+    return new ExceptionServerFunctionResponse(getErrorMessage(err)); 
   } finally {
     await prisma.$disconnect();
   }
@@ -304,7 +304,7 @@ export async function updateUserByEmail(
 
     return new SuccessServerFunctionResponse("Zaktualizowano dane użytkownika", updatedUser);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -346,7 +346,7 @@ export async function updateUserById(
 
     return new SuccessServerFunctionResponse("Zaktualizowano dane użytkownika", updatedUser);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -404,7 +404,7 @@ export async function updateUserPasswordByEmail(
 
     return new SuccessServerFunctionResponse("Zaktualizowano hasło użytkownika", updatedUser);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -462,7 +462,7 @@ export async function updateUserPasswordById(
 
     return new SuccessServerFunctionResponse("Zaktualizowano hasło użytkownika", updatedUser);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -532,7 +532,7 @@ export async function deleteUserByEmail(userEmail: string): Promise<ServerFuncti
     });
     return new SuccessServerFunctionResponse("Usunięto użytkownika", null);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -545,7 +545,7 @@ export async function deleteUserById(userId: string): Promise<ServerFunctionResp
     });
     return new SuccessServerFunctionResponse("Usunięto użytkownika", null);
   } catch (err: unknown) {
-    return new ErrorServerFunctionResponse(getErrorMessage(err));
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
