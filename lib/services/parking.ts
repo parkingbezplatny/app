@@ -57,6 +57,10 @@ export async function createParking(
 
 export async function getParkingById(id: string): Promise<ServerFunctionResponse<TParking | null>> {
   try {
+    if (id === "") {
+      return new ErrorServerFunctionResponse("Id nie może być puste");
+    }
+
     const parking = await prisma.parking.findUnique({
       include: {
         favoriteUsers: true,
