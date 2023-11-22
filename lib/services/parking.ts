@@ -207,7 +207,7 @@ export async function getParkings(): Promise<ServerFunctionResponse<TParking[] |
       },
     });
 
-    if (!parkings || parkings.length <= 0)
+    if (!parkings)
     {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
