@@ -12,9 +12,9 @@ import {
 export async function signInWithGoogle(
   email: string = "",
   username: string = ""
-): Promise<ServerFunctionResponse<TUser | null>> {
+): Promise<TUser> {
   try {
-    const user = await prisma.user.findUnique({
+    const userExist = await prisma.user.findUnique({
       where: {
         email: email,
       },
@@ -29,11 +29,13 @@ export async function signInWithGoogle(
       },
     });
 
-    if (user) {
-      if (!user.isGoogle) {
-        return new ErrorServerFunctionResponse("Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło.");
+    if (userExist) {
+      if (!userExist.isGoogle) {
+        throw new Error(
+          "Konto o tym adresie email już istnieje. Spróbuj zalogować używając email i hasło."
+        );
       } else {
-        return new SuccessServerFunctionResponse("Zalogowano pomyślnie", user);
+        return userExist;
       }
     } else {
       const newUser = await prisma.user.create({
@@ -55,10 +57,10 @@ export async function signInWithGoogle(
         },
       });
 
-      return new SuccessServerFunctionResponse("Utworzono nowe konto użytkownika", newUser);
+      return newUser;
     }
   } catch (err: unknown) {
-    return new ExceptionServerFunctionResponse(getErrorMessage(err));
+    throw err;
   } finally {
     prisma.$disconnect();
   }
@@ -67,12 +69,9 @@ export async function signInWithGoogle(
 export async function signInWithCredential(
   email: string | undefined,
   password: string | undefined
-): Promise<ServerFunctionResponse<TUser | null>> {
+): Promise<TUser> {
   try {
-    if (!email || !password) 
-    {
-      return new ErrorServerFunctionResponse("Nieprawidłowe dane logowania");
-    }
+    if (!email || !password) throw new Error("Nieprawidłowe dane logowania");
 
     const user = await prisma.user.findUnique({
       where: {
@@ -84,10 +83,7 @@ export async function signInWithCredential(
       },
     });
 
-    if (!user) 
-    {
-      return new ErrorServerFunctionResponse("Nieprawidłowe dane logowania");
-    }
+    if (!user) throw new Error("Nieprawidłowe dane logowania");
     if (user.isGoogle)
       throw new Error(
         "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
@@ -95,24 +91,32 @@ export async function signInWithCredential(
     if (!(await comparePassword(password, user.password)))
       throw new Error("Nieprawidłowe dane logowania");
 
-    const u = (await getUserByEmail(email)).data;
-    return new SuccessServerFunctionResponse("Zalogowano pomyślnie", u);
+    const getUserByEmailResponse = await getUserByEmail(email);
+    if (getUserByEmailResponse.data === null) {
+      throw new Error(getUserByEmailResponse.message);
+    }
+
+    return getUserByEmailResponse.data;
   } catch (err: unknown) {
-    return new ExceptionServerFunctionResponse(getErrorMessage(err));
+    throw err;
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFunctionResponse<TUser | null>> {
+export async function signUpWithCreadential(user: TSignUpForm): Promise<TUser> {
   try {
-    const foundUser = (await getUserByEmail(user.email)).data;
-    if (foundUser !== null) {
-      if (foundUser.isGoogle)
-      {
-        return new ErrorServerFunctionResponse("Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google.");
-      }
-      return new ErrorServerFunctionResponse("Użytkownik już istnieje");
+    const getUserByEmailResponse = await getUserByEmail(user.email);
+    if (getUserByEmailResponse.data === null) {
+      throw new Error(getUserByEmailResponse.message);
+    }
+    const userExist = getUserByEmailResponse.data;
+    if (userExist) {
+      if (userExist.isGoogle)
+        throw new Error(
+          "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
+        );
+      throw new Error("Użytkownik już istnieje");
     }
 
     const hashedPassword = await hashPassword(user.passwords.password);
@@ -136,14 +140,11 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFu
       },
     });
 
-    if (!newUser)
-    {
-      return new ErrorServerFunctionResponse("Błąd tworzenia nowego użytkownika");
-    }
+    if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
 
-    return new SuccessServerFunctionResponse("Utworzono nowe konto użytkownika", newUser);
+    return newUser;
   } catch (err: unknown) {
-    return new ExceptionServerFunctionResponse(getErrorMessage(err));
+    throw getErrorMessage(err);
   } finally {
     await prisma.$disconnect();
   }
