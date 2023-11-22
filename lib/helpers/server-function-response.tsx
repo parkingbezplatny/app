@@ -25,3 +25,5 @@ export class ErrorServerFunctionResponse extends ServerFunctionResponse<null> {
 }
 
 export class ExceptionServerFunctionResponse extends ErrorServerFunctionResponse {}
+
+export class ApiResponse<T> extends ServerFunctionResponse<T> {}
