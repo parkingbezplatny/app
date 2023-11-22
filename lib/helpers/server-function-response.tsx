@@ -27,3 +27,13 @@ export class ErrorServerFunctionResponse extends ServerFunctionResponse<null> {
 export class ExceptionServerFunctionResponse extends ErrorServerFunctionResponse {}
 
 export class ApiResponse<T> extends ServerFunctionResponse<T> {}
+
+export function serverFunctionToApiResponse<T>(
+  serverFunctionResponse: ServerFunctionResponse<any>
+): ApiResponse<any> {
+  return new ApiResponse<T>(
+    serverFunctionResponse.success,
+    serverFunctionResponse.message,
+    serverFunctionResponse.data
+  );
+}
