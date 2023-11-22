@@ -66,7 +66,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ user, token, account }) {
       if (user) {
         if (account?.provider === "google") {
-          const userExists = await getUserByEmail(user.email as string);
+          const response = await getUserByEmail(user.email as string);
+          const userExists = response.data;
           if (!userExists) return token;
           token.user = { ...userExists };
           return token;
