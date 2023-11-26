@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
-import { createRoot } from "react-dom/client";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 
 import MapTooltip from "./map-tooltip";
 
-type TMapProps = {
+export type TMapProps = {
   lng: number;
   lat: number;
 };
