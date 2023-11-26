@@ -1,40 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, useBreakpointValue, Slide, IconButton } from "@chakra-ui/react";
+import Map, { TMapProps } from "@/components/map";
+import agent from "@/lib/api/agent";
+import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
+import { Address } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import Navbar from "components/navbar";
+import SidePanel, { Parking } from "components/sidepanel";
+import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-import Navbar from "components/navbar";
-import SidePanel from "components/sidepanel";
-import Map from "@/components/map";
+function getParkingName(address: Address) {
+  return `${address.street} ${address.houseNumber}, ${address.city} ${address.postalCode}, ${address.county}`;
+}
 
 function Dashboard() {
   const [tab, setTab] = useState("favorites");
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
 
-  const parkings = [
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-  ];
+  const {
+    data: parkingsResponse,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["parkings"],
+    queryFn: () => agent.Parkings.list(),
+  });
+
+  const parkings: Parking[] =
+    !parkingsResponse || !parkingsResponse.data || parkingsResponse.data.length === 0
+      ? []
+      : parkingsResponse.data.map((parking) => {
+          return {
+            name: getParkingName(parking.properties?.address as Address),
+            coordinates: {
+              lat: parking.geometry.coordinates[0],
+              lng: parking.geometry.coordinates[1],
+            },
+            city: parking.properties.address.city,
+          };
+        });
+
+  const mapProps: TMapProps =
+    !parkingsResponse || !parkingsResponse.data || parkingsResponse.data.length === 0
+      ? { lng: 0.0, lat: 0.0 }
+      : {
+          lng: parkingsResponse.data[0].geometry.coordinates[0],
+          lat: parkingsResponse.data[0].geometry.coordinates[1],
+        };
 
   return (
     <>
@@ -51,7 +65,7 @@ function Dashboard() {
             direction="left"
             in={true}
           >
-            <SidePanel tab={tab} setTab={setTab} parkings={parkings} />
+            <SidePanel tab={tab} setTab={setTab} parkings={...parkings} />
           </Slide>
         ) : null}
         {!isLargerThanLG && (
@@ -70,10 +84,7 @@ function Dashboard() {
           />
         )}
         <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          <Map
-            lng={parkings[0].coordinates.lng}
-            lat={parkings[0].coordinates.lat}
-          />
+          <Map lng={mapProps.lng} lat={mapProps.lat} />
         </Box>
       </Box>
     </>
