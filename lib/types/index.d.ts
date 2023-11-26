@@ -1,6 +1,3 @@
-import * as z from "zod";
-import { SignInValidation } from "../validations/forms/signIn.validation";
-import { SignUpValidation } from "../validations/forms/signUp.validation";
 import {
   Address,
   FavoriteParkingAndUser,
@@ -10,10 +7,13 @@ import {
   RatingParkingAndUser,
   User,
 } from "@prisma/client";
-import { UpdateParkingValidation } from "../validations/forms/updateParking.validation";
+import * as z from "zod";
 import { CreateParkingValidation } from "../validations/forms/createParking.validation";
-import { UpdateUserUsernameValidation } from "../validations/forms/updateUserUsername.validation";
+import { SignInValidation } from "../validations/forms/signIn.validation";
+import { SignUpValidation } from "../validations/forms/signUp.validation";
+import { UpdateParkingValidation } from "../validations/forms/updateParking.validation";
 import { UpdateUserPasswordValidation } from "../validations/forms/updateUserPassword.validation";
+import { UpdateUserUsernameValidation } from "../validations/forms/updateUserUsername.validation";
 
 export type TModalProps = {
   isOpen: boolean;
@@ -30,14 +30,12 @@ export type TUpdateUserUsername = z.infer<typeof UpdateUserUsernameValidation>;
 export type TUpdateUserPassword = z.infer<typeof UpdateUserPasswordValidation>;
 
 export type TParking = {
-  favoriteUsers: FavoriteParkingAndUser[] | null;
-  userRatings: RatingParkingAndUser[] | null;
-  properties:
-    | ({
-        address: Address | null;
-      } & Properties)
-    | null;
-  geometry: Geometry | null;
+  favoriteUsers: FavoriteParkingAndUser[];
+  userRatings: RatingParkingAndUser[];
+  properties: {
+    address: Address;
+  } & Properties;
+  geometry: Geometry;
 } & Parking;
 
 export type TParkingMap = {

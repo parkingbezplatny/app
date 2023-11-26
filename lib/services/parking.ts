@@ -47,7 +47,7 @@ export async function createParking(
       },
     });
 
-    return new SuccessServerFunctionResponse<TParking>("Pomyślnie dodano parking", newParking);
+    return new SuccessServerFunctionResponse<TParking>("Pomyślnie dodano parking", newParking as TParking);
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -80,7 +80,7 @@ export async function getParkingById(id: string): Promise<ServerFunctionResponse
     if (!parking) {
       return new ErrorServerFunctionResponse("Nie znalezniono parkingu");
     }
-    return new SuccessServerFunctionResponse<TParking>("Znaleziono parking", parking);
+    return new SuccessServerFunctionResponse<TParking>("Znaleziono parking", parking as TParking);
   } catch (err) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -147,7 +147,7 @@ export async function getParkingsWithPagination(
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse<TParking[]>("Znaleziono parkingi", parkings);
+    return new SuccessServerFunctionResponse<TParking[]>("Znaleziono parkingi", parkings as TParking[]);
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -184,7 +184,7 @@ export async function getParkingsByCity(city: string): Promise<ServerFunctionRes
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);
+    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings as TParking[]);
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -212,7 +212,7 @@ export async function getParkings(): Promise<ServerFunctionResponse<TParking[] |
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);;
+    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings as TParking[]);;
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -270,7 +270,7 @@ export async function updateParkingById(
       return new ErrorServerFunctionResponse("Błąd aktualizacji danych parkingu");
     }
 
-    return new SuccessServerFunctionResponse("Pomyślnie zaktualizowano dane parkingu", updatedParking);
+    return new SuccessServerFunctionResponse("Pomyślnie zaktualizowano dane parkingu", updatedParking as TParking);
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
