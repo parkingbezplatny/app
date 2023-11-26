@@ -11,12 +11,12 @@ import {
   Input,
 } from "@chakra-ui/react";
 
-interface Coordinates {
+export interface Coordinates {
   lat: number;
   lng: number;
 }
 
-interface Parking {
+export interface Parking {
   name: string;
   coordinates: Coordinates;
   city: string;
