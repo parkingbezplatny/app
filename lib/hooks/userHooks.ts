@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import agent from "../api/agent";
-import { TUpdateUserUsername } from "../types";
+import { TUpdateUserPassword, TUpdateUserUsername } from "../types";
 
 export type TUseUpdateUsernameProps = {
     email: string;
@@ -19,3 +19,17 @@ export const useUpdateUsername = (onSuccess: () => void) => {
       });
 }
 
+export type TUseUpdatePasswordProps = {
+    email: string;
+  } & TUpdateUserPassword;
+
+function updatePassword({ email, passwords }: TUseUpdatePasswordProps) {
+    return agent.Users.updatePasswordByEmail(email, {passwords});
+  }
+
+export const useUpdatePassword = (onSuccess: () => void) => {
+    return useMutation({
+        mutationFn: updatePassword,
+        onSuccess: onSuccess,
+      });
+}
