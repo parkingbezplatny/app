@@ -22,8 +22,12 @@ const Parkings = {
     delete: (id: string) => axios.delete<void>(`/parkings/${id}`)
 }
 
+const Users = {
+}
+
 const agent = {
-    Parkings
+    Parkings,
+    Users,
 }
 
 export default agent;
