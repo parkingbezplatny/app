@@ -1,20 +1,47 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
+  Button,
   FormControl,
   FormLabel,
   Input,
-  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from "@chakra-ui/react";
 
+import { useUpdateUsername } from "@/lib/hooks/userHooks";
 import { TModalProps } from "@/lib/types";
+import { useToast } from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 
 export default function UsernameModal({ isOpen, onClose }: TModalProps) {
+  const { data: session } = useSession();
+  const [username, setUsername] = useState(session?.user.username ?? "");
+  const toast = useToast();
+
+  const { mutate: updateUsername, isLoading } = useUpdateUsername(onClose);
+
+  const onSave = () => {
+    if (session?.user.email && session.user.email !== "") {
+      return updateUsername({
+        email: session?.user.email ?? "",
+        username: username,
+      });
+    } else {
+      toast({
+        title: "Wystąpił problem.",
+        description: "Zmiana nazwy użytkownika nie powiodła się.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -27,6 +54,8 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
             <Input
               focusBorderColor="orange.400"
               placeholder="Nazwa użytkownika"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </FormControl>
         </ModalBody>
@@ -38,9 +67,9 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
             }}
             textColor="white"
             mr={3}
-            onClick={onClose}
+            onClick={onSave}
           >
-            Save
+            {isLoading ? "Zapisywanie..." : "Zapisz"}
           </Button>
           <Button variant="ghost" onClick={onClose}>
             Cancel
