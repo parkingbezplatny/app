@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/lib/helpers/server-function-response";
-import { TParking, TParkingMap } from "@/lib/types";
+import { TParking, TParkingMap, TUpdateUserUsername, TUser } from "@/lib/types";
 import axios, { AxiosResponse } from "axios";
 
 axios.defaults.baseURL = '/api';
@@ -23,6 +23,7 @@ const Parkings = {
 }
 
 const Users = {
+    updateUsernameByEmail: (email: string, updateUserUsername: TUpdateUserUsername) => axios.patch<TUser>(`/users/by-email?email=${email}`, updateUserUsername),
 }
 
 const agent = {
