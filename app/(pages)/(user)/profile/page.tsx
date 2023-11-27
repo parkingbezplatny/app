@@ -1,28 +1,26 @@
 "use client";
 
 import {
-  Box,
-  Heading,
   Avatar,
+  Box,
   Button,
+  Flex,
+  Heading,
   IconButton,
   SimpleGrid,
   useBreakpointValue,
   useDisclosure,
-  Flex,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { FaTrash } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-
+import { FaTrash } from "react-icons/fa";
 
 import Navbar from "@/components/navbar";
-import UsernameModal from "@/components/username-modal";
 import PasswordModal from "@/components/password-modal";
+import UsernameModal from "@/components/username-modal";
 
 export default function Profile() {
   const { data: session } = useSession();
-  
+
   const columns = useBreakpointValue({ base: 1, md: 2, lg: 3 });
 
   const usernameModal = useDisclosure();
@@ -116,7 +114,7 @@ export default function Profile() {
           my={4}
         />
         <Heading size="md" mb={6}>
-        {session?.user?.username}
+          {session?.user?.username}
         </Heading>
         <Flex mb={4}>
           <Button
@@ -145,7 +143,7 @@ export default function Profile() {
         </Flex>
       </Box>
       <Box p={4}>
-      <SimpleGrid columns={columns} spacing={5}>
+        <SimpleGrid columns={columns} spacing={5}>
           {parkings.map((parking, index) => (
             <Box
               key={index}
@@ -188,8 +186,14 @@ export default function Profile() {
           ))}
         </SimpleGrid>
       </Box>
-      <UsernameModal isOpen={usernameModal.isOpen} onClose={usernameModal.onClose} />
-      <PasswordModal isOpen={passwordModal.isOpen} onClose={passwordModal.onClose} />
+      <UsernameModal
+        isOpen={usernameModal.isOpen}
+        onClose={usernameModal.onClose}
+      />
+      <PasswordModal
+        isOpen={passwordModal.isOpen}
+        onClose={passwordModal.onClose}
+      />
     </Box>
   );
 }
