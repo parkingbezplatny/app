@@ -1,10 +1,9 @@
 "use client";
 
 import Map, { TMapProps } from "@/components/map";
-import agent from "@/lib/api/agent";
+import { useGetAllParkings } from "@/lib/hooks/parkingHooks";
 import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
 import { Address } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
 import Navbar from "components/navbar";
 import SidePanel, { Parking } from "components/sidepanel";
 import { useState } from "react";
@@ -19,17 +18,12 @@ function Dashboard() {
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
 
-  const {
-    data: parkingsResponse,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["parkings"],
-    queryFn: () => agent.Parkings.list(),
-  });
+  const { data: parkingsResponse } = useGetAllParkings();
 
   const parkings: Parking[] =
-    !parkingsResponse || !parkingsResponse.data || parkingsResponse.data.length === 0
+    !parkingsResponse ||
+    !parkingsResponse.data ||
+    parkingsResponse.data.length === 0
       ? []
       : parkingsResponse.data.map((parking) => {
           return {
@@ -43,7 +37,9 @@ function Dashboard() {
         });
 
   const mapProps: TMapProps =
-    !parkingsResponse || !parkingsResponse.data || parkingsResponse.data.length === 0
+    !parkingsResponse ||
+    !parkingsResponse.data ||
+    parkingsResponse.data.length === 0
       ? { lng: 0.0, lat: 0.0 }
       : {
           lng: parkingsResponse.data[0].geometry.coordinates[0],
