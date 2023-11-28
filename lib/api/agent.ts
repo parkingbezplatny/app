@@ -23,8 +23,8 @@ const Parkings = {
 }
 
 const Users = {
-    updateUsernameByEmail: (email: string, updateUserUsername: TUpdateUserUsername) => axios.patch<TUser>(`/users/by-email?email=${email}`, updateUserUsername),
-    updatePasswordByEmail: (email: string, updateUserPassword: TUpdateUserPassword) => axios.patch<TUser>(`/users/password-reset/by-email?email=${email}`, updateUserPassword),
+    updateUsernameByEmail: (email: string, updateUserUsername: TUpdateUserUsername) => axios.patch<ApiResponse<TUser | null>>(`/users/by-email?email=${email}`, updateUserUsername),
+    updatePasswordByEmail: (email: string, updateUserPassword: TUpdateUserPassword) => axios.patch<ApiResponse<TUser | null>>(`/users/password-reset/by-email?email=${email}`, updateUserPassword),
 }
 
 const agent = {
