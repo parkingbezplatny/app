@@ -16,31 +16,60 @@ import { useUpdateUsername } from "@/lib/hooks/userHooks";
 import { TModalProps } from "@/lib/types";
 import { useToast } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function UsernameModal({ isOpen, onClose }: TModalProps) {
   const { data: session } = useSession();
   const [username, setUsername] = useState(session?.user.username ?? "");
   const toast = useToast();
 
-  const { mutate: updateUsername, isLoading } = useUpdateUsername(onClose);
+  const {
+    mutate: updateUsername,
+    data: updateUsernameResponse,
+    isSuccess,
+    isLoading,
+  } = useUpdateUsername(onClose);
+
+  const usernameChangeErrorToast = () => {
+    toast({
+      title: "Wystąpił problem.",
+      description: "Zmiana nazwy użytkownika nie powiodła się.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const usernameChangeSuccessToast = () => {
+    toast({
+      title: "Sukces.",
+      description: "Nazwa użytkownika została zmieniona.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
 
   const onSave = () => {
     if (session?.user.email && session.user.email !== "") {
-      return updateUsername({
+      updateUsername({
         email: session?.user.email ?? "",
         username: username,
       });
     } else {
-      toast({
-        title: "Wystąpił problem.",
-        description: "Zmiana nazwy użytkownika nie powiodła się.",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
+      usernameChangeErrorToast();
     }
   };
+
+  useEffect(() => {
+    if (isSuccess && updateUsernameResponse?.data.success) {
+      usernameChangeSuccessToast();
+    }
+
+    if (isSuccess && !updateUsernameResponse?.data.success) {
+      usernameChangeErrorToast();
+    }
+  }, [isSuccess]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
