@@ -1,27 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useSignUp } from "@/lib/hooks/authHooks";
+import { TSignUpForm } from "@/lib/types";
+import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
 import {
-  Flex,
   Box,
+  Button,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  Heading,
   Input,
   Link,
   Stack,
-  Button,
-  Heading,
   Text,
   useColorModeValue,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
-import { TSignUpForm } from "@/lib/types";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
 
-function SignUp() {
+export default function SignUp() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [signUpError, setSignUpError] = useState<string>("");
   const {
     register,
@@ -32,12 +36,34 @@ function SignUp() {
     mode: "onChange",
   });
 
-  const credentialSignUp = async (values: TSignUpForm) => {
-    setSignUpError("");
-    // TODO Call to API with values
-    console.log(values);
-    setSignUpError("TODO Call to API with values");
+  const {
+    mutate: credentialsSignUp,
+    data: credentialsSignUpResponse,
+    isSuccess,
+    isLoading,
+  } = useSignUp();
+
+  const onSubmit = async (data: TSignUpForm) => {
+    if (Object.keys(errors).length === 0) {
+      credentialsSignUp(data);
+      setEmail(data.email);
+      setPassword(data.passwords.password);
+    }
   };
+
+  useEffect(() => {
+    if (isSuccess && !credentialsSignUpResponse.data.success) {
+      setSignUpError(credentialsSignUpResponse.data.message);
+    }
+
+    if (isSuccess && credentialsSignUpResponse.data.success) {
+      signIn("credentials", {
+        email: email,
+        password: password,
+        callbackUrl: "/dashboard",
+      });
+    }
+  }, [credentialsSignUpResponse]);
 
   return (
     <Flex
@@ -71,7 +97,7 @@ function SignUp() {
                 {signUpError}
               </Box>
             )}
-            <form onSubmit={handleSubmit(credentialSignUp)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={4} w={{ base: 300, sm: 400 }}>
                 <FormControl id="email" isInvalid={!!errors.email}>
                   <FormLabel fontSize="md">Email</FormLabel>
@@ -174,5 +200,3 @@ function SignUp() {
     </Flex>
   );
 }
-
-export default SignUp;
