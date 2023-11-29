@@ -1,32 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import { TSignInForm } from "@/lib/types";
+import { SignInValidation } from "@/lib/validations/forms/signIn.validation";
 import {
-  Flex,
   Box,
+  Button,
+  Divider,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  HStack,
+  Heading,
+  Icon,
   Input,
   Link,
-  Icon,
   Stack,
-  HStack,
-  Divider,
-  Button,
-  Heading,
   Text,
   useColorModeValue,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import { FaGoogle } from "react-icons/fa";
-import { signIn } from "next-auth/react";
-import { useForm } from "react-hook-form";
-import { TSignInForm } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInValidation } from "@/lib/validations/forms/signIn.validation";
-import { useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { FaGoogle } from "react-icons/fa";
 
 function SignIn() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -54,6 +56,12 @@ function SignIn() {
       callbackUrl: "/dashboard",
     });
   };
+
+  useEffect(() => {
+    if (session) {
+      router.replace("/dashboard");
+    }
+  }, [session]);
 
   return (
     <Flex
