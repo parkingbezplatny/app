@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/lib/helpers/server-function-response";
-import { TParking, TParkingMap, TUpdateUserPassword, TUpdateUserUsername, TUser } from "@/lib/types";
+import { TParking, TParkingMap, TSignUpForm, TUpdateUserPassword, TUpdateUserUsername, TUser } from "@/lib/types";
 import axios, { AxiosResponse } from "axios";
 
 axios.defaults.baseURL = '/api';
@@ -27,9 +27,14 @@ const Users = {
     updatePasswordByEmail: (email: string, updateUserPassword: TUpdateUserPassword) => axios.patch<ApiResponse<TUser | null>>(`/users/password-reset/by-email?email=${email}`, updateUserPassword),
 }
 
+const Auth = {
+    signUpWithCredentials: (sigupFrom: TSignUpForm) => axios.post<ApiResponse<TUser | null>>(`/account`, sigupFrom),
+}
+
 const agent = {
     Parkings,
     Users,
+    Auth
 }
 
 export default agent;
