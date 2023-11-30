@@ -1,12 +1,12 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { getErrorMessage } from "../helpers/errorMessage";
 import {
   getUserByEmail,
   signInWithCredential,
   signInWithGoogle,
 } from "../services/user";
-import { getErrorMessage } from "../helpers/errorMessage";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -63,7 +63,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ user, token, account }) {
+    async jwt({ user, token, account, trigger }) {
       if (user) {
         if (account?.provider === "google") {
           const response = await getUserByEmail(user.email as string);
@@ -75,6 +75,15 @@ export const authOptions: NextAuthOptions = {
         token.user = { ...user.user };
         return token;
       }
+
+      if (trigger === "update" && token?.user) {
+        const response = await getUserByEmail(token.user.email as string);
+        const retrievedUser = response.data;
+        if (!retrievedUser) return token;
+        token.user = { ...retrievedUser };
+        return token;
+      }
+
       return token;
     },
 
