@@ -19,7 +19,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function UsernameModal({ isOpen, onClose }: TModalProps) {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [username, setUsername] = useState(session?.user.username ?? "");
   const toast = useToast();
 
@@ -63,13 +63,14 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
 
   useEffect(() => {
     if (isSuccess && updateUsernameResponse?.data.success) {
+      updateSession();
       usernameChangeSuccessToast();
     }
 
     if (isSuccess && !updateUsernameResponse?.data.success) {
       usernameChangeErrorToast();
     }
-  }, [isSuccess]);
+  }, [isSuccess, updateUsernameResponse]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
