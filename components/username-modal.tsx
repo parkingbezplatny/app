@@ -98,11 +98,12 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
             textColor="white"
             mr={3}
             onClick={onSave}
+            isLoading={isLoading}
           >
-            {isLoading ? "Zapisywanie..." : "Zapisz"}
+            Zapisz
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            Anuluj
           </Button>
         </ModalFooter>
       </ModalContent>
