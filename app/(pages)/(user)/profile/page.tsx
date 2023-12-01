@@ -1,5 +1,9 @@
 "use client";
 
+import Navbar from "@/components/navbar";
+import PasswordModal from "@/components/password-modal";
+import UsernameModal from "@/components/username-modal";
+import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import {
   Avatar,
   Box,
@@ -14,10 +18,6 @@ import {
 import { useSession } from "next-auth/react";
 import { FaTrash } from "react-icons/fa";
 
-import Navbar from "@/components/navbar";
-import PasswordModal from "@/components/password-modal";
-import UsernameModal from "@/components/username-modal";
-
 export default function Profile() {
   const { data: session } = useSession();
 
@@ -26,68 +26,12 @@ export default function Profile() {
   const usernameModal = useDisclosure();
   const passwordModal = useDisclosure();
 
-  const parkings = [
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-  ];
+  const favoriteParkingsIds =
+    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+  const { data: parkingsQueryResult, isSuccess } =
+    useGetFavoriteParkings(favoriteParkingsIds);
+
+  const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
   return (
     <Box minH="100vh">
