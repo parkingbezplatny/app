@@ -124,11 +124,12 @@ export default function PasswordModal({ isOpen, onClose }: TModalProps) {
             textColor="white"
             mr={3}
             onClick={onSave}
+            isLoading={isLoading}
           >
-            {isLoading ? "Save..." : "Save"}
+            Zapisz
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            Anuluj
           </Button>
         </ModalFooter>
       </ModalContent>
