@@ -1,5 +1,5 @@
 import { ApiResponse } from "@/lib/helpers/server-function-response";
-import { TParking, TParkingMap, TSignUpForm, TUpdateUserPassword, TUpdateUserUsername, TUser } from "@/lib/types";
+import { TCreateParking, TParking, TParkingMap, TSignUpForm, TUpdateUserPassword, TUpdateUserUsername, TUser } from "@/lib/types";
 import axios, { AxiosResponse } from "axios";
 
 axios.defaults.baseURL = '/api';
@@ -17,7 +17,7 @@ const Parkings = {
     list: () => requests.get<ApiResponse<TParking[] | null>>('/parkings'),
     listForMap: () => requests.get<ApiResponse<TParkingMap[] | null>>('/parkings?formatting=map'),
     details: (id: string) => requests.get<TParking | null>(`/parkings/${id}`),
-    create: (parking: TParking) => axios.post<void>('/parkings', parking),
+    create: (parking: TCreateParking) => axios.post<ApiResponse<TParking | null>>('/parkings', parking),
     update: (parking: TParking) => axios.put<void>(`/parkings/${parking.id}`, parking),
     delete: (id: string) => axios.delete<void>(`/parkings/${id}`)
 }

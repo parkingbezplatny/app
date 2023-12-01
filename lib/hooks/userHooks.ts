@@ -2,7 +2,7 @@ import { Parking } from "@/components/sidepanel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { ApiResponse } from "../helpers/server-function-response";
-import { TParking, TUpdateUserPassword, TUpdateUserUsername } from "../types";
+import { TCreateParking, TParking, TUpdateUserPassword, TUpdateUserUsername } from "../types";
 
 export type TUseUpdateUsernameProps = {
     email: string;
@@ -69,3 +69,14 @@ export const useGetFavoriteParkings = (parkingsIds: number[]) => {
         select: mapFavoriteParkings
     });
 };
+
+function createParking(createParking: TCreateParking) {
+    return agent.Parkings.create(createParking);
+  }
+
+export const useCreateParking = (onSuccess: () => void) => {
+    return useMutation({
+        mutationFn: createParking,
+        onSuccess: onSuccess,
+      });
+}

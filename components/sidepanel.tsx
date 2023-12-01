@@ -1,15 +1,17 @@
-import React from "react";
 import {
   Box,
-  Center,
   Button,
-  HStack,
+  Center,
   Divider,
+  HStack,
   Heading,
+  Input,
   List,
   Text,
-  Input,
+  useDisclosure,
 } from "@chakra-ui/react";
+import React from "react";
+import CreateParkingModal from "./parking/create-parking-modal";
 
 export interface Coordinates {
   lat: number;
@@ -29,13 +31,17 @@ interface SidePanelProps {
 }
 
 const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
+  const createParkingModal = useDisclosure();
+
   return (
     <Box
       minW="230px"
-      height="calc(100dvh - 83px)"
+      height="calc(100vh - 83px)"
       p={5}
       borderRight="1px solid #A0AEC0"
       bg="white"
+      display="flex"
+      flexDirection="column"
     >
       <Center justifyContent="space-evenly" mb={2}>
         <Button
@@ -106,6 +112,24 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
           />
         </>
       )}
+
+      <Button
+        mt="auto"
+        bg="orange.500"
+        _hover={{
+          bg: "orange.600",
+        }}
+        textColor="white"
+        borderRadius="md"
+        onClick={createParkingModal.onOpen}
+      >
+        Dodaj
+      </Button>
+      <CreateParkingModal
+        onOpen={createParkingModal.onOpen}
+        isOpen={createParkingModal.isOpen}
+        onClose={createParkingModal.onClose}
+      />
     </Box>
   );
 };

@@ -17,6 +17,7 @@ import { UpdateUserUsernameValidation } from "../validations/forms/updateUserUse
 
 export type TModalProps = {
   isOpen: boolean;
+  onOpen?: () => void;
   onClose: () => void;
 };
 

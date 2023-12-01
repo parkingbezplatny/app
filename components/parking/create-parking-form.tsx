@@ -1,3 +1,4 @@
+import { useCreateParking } from "@/lib/hooks/userHooks";
 import { TCreateParking } from "@/lib/types";
 import { CreateParkingValidation } from "@/lib/validations/forms/createParking.validation";
 import {
@@ -10,12 +11,18 @@ import {
   Heading,
   Input,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-function CreateParkingForm() {
+interface CreateParkingFormProps {
+  onClose: () => void;
+}
+
+function CreateParkingForm({ onClose }: CreateParkingFormProps) {
+  const toast = useToast();
   const [createParkingError, setCreateParkingError] = useState<string>("");
   const {
     register,
@@ -32,13 +39,47 @@ function CreateParkingForm() {
     },
   });
 
-  const createParking = async (values: TCreateParking) => {
-    setCreateParkingError("");
-    // TODO Call to API with values
-    console.log(values);
-    alert(values);
-    setCreateParkingError("TODO Call to API with values");
+  const createParkingErrorToast = () => {
+    toast({
+      title: "Wystąpił problem.",
+      description: "Dodawanie parkingu nie powiodło się.",
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
   };
+
+  const createParkingSuccessToast = () => {
+    toast({
+      title: "Sukces.",
+      description: "Pomyślnie dodano parking.",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
+  const {
+    mutate: createParking,
+    data: createParkingResponse,
+    isSuccess,
+  } = useCreateParking(onClose);
+
+  const onSubmit = async (data: TCreateParking) => {
+    if (Object.keys(errors).length === 0) {
+      createParking(data);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess && createParkingResponse?.data.success) {
+      createParkingSuccessToast();
+    }
+
+    if (isSuccess && !createParkingResponse?.data.success) {
+      createParkingErrorToast();
+    }
+  }, [isSuccess, createParkingResponse]);
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>
@@ -55,7 +96,7 @@ function CreateParkingForm() {
           {createParkingError}
         </Box>
       )}
-      <form onSubmit={handleSubmit(createParking)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={4} w={{ base: 300, sm: 400 }}>
           <FormControl id="type" isInvalid={!!errors.type}>
             <FormLabel fontSize="md">Typ</FormLabel>
