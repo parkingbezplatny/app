@@ -19,7 +19,7 @@ const Parkings = {
     details: (id: string) => requests.get<TParking | null>(`/parkings/${id}`),
     create: (parking: TCreateParking) => axios.post<ApiResponse<TParking | null>>('/parkings', parking),
     update: (parking: TParking) => axios.put<void>(`/parkings/${parking.id}`, parking),
-    delete: (id: string) => axios.delete<void>(`/parkings/${id}`)
+    delete: (id: string) => axios.delete<ApiResponse<null>>(`/parkings/${id}`)
 }
 
 const Users = {

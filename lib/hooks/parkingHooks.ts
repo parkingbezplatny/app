@@ -1,5 +1,5 @@
 import { Parking } from "@/components/sidepanel";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { ApiResponse } from "../helpers/server-function-response";
 import { TParking } from "../types";
@@ -30,5 +30,16 @@ export const useGetAllParkings = () => {
         queryKey: ["parkings"],
         queryFn: getParkings,
         select: mapParkings,
+      });
+}
+
+function deleteParking(id: string) {
+    return agent.Parkings.delete(id);
+}
+
+export const useDeleteParking = (onSuccess: () => void) => {
+    return useMutation({
+        mutationFn: deleteParking,
+        onSuccess: onSuccess,
       });
 }
