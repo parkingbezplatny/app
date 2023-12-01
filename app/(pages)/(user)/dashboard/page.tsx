@@ -1,24 +1,24 @@
 "use client";
 
 import Map, { TMapProps } from "@/components/map";
-import { useGetAllParkings } from "@/lib/hooks/parkingHooks";
+import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
-import { Address } from "@prisma/client";
 import Navbar from "components/navbar";
 import SidePanel from "components/sidepanel";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-function getParkingName(address: Address) {
-  return `${address.street} ${address.houseNumber}, ${address.city} ${address.postalCode}, ${address.county}`;
-}
-
 function Dashboard() {
+  const { data: session } = useSession();
   const [tab, setTab] = useState("favorites");
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
 
-  const { data: parkingsQueryResult } = useGetAllParkings();
+  const favoriteParkingsIds =
+    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+  const { data: parkingsQueryResult, isSuccess } =
+    useGetFavoriteParkings(favoriteParkingsIds);
 
   const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
