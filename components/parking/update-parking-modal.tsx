@@ -33,7 +33,7 @@ function UpdateParkingModal({ parkingId }: Props) {
           <ModalHeader>Edytuj parking</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <UpdateParkingForm parkingId={parkingId} />
+            <UpdateParkingForm parkingId={parkingId} onClose={onClose}/>
           </ModalBody>
         </ModalContent>
       </Modal>
