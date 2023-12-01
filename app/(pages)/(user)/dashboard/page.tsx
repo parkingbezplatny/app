@@ -5,7 +5,7 @@ import { useGetAllParkings } from "@/lib/hooks/parkingHooks";
 import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
 import { Address } from "@prisma/client";
 import Navbar from "components/navbar";
-import SidePanel, { Parking } from "components/sidepanel";
+import SidePanel from "components/sidepanel";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
@@ -18,33 +18,14 @@ function Dashboard() {
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
 
-  const { data: parkingsResponse } = useGetAllParkings();
+  const { data: parkingsQueryResult } = useGetAllParkings();
 
-  const parkings: Parking[] =
-    !parkingsResponse ||
-    !parkingsResponse.data ||
-    parkingsResponse.data.length === 0
-      ? []
-      : parkingsResponse.data.map((parking) => {
-          return {
-            name: getParkingName(parking.properties?.address as Address),
-            coordinates: {
-              lat: parking.geometry.coordinates[0],
-              lng: parking.geometry.coordinates[1],
-            },
-            city: parking.properties.address.city,
-          };
-        });
+  const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
   const mapProps: TMapProps =
-    !parkingsResponse ||
-    !parkingsResponse.data ||
-    parkingsResponse.data.length === 0
-      ? { lng: 0.0, lat: 0.0 }
-      : {
-          lng: parkingsResponse.data[0].geometry.coordinates[0],
-          lat: parkingsResponse.data[0].geometry.coordinates[1],
-        };
+    parkings && parkings.length > 0
+      ? parkings[0].coordinates
+      : { lng: 0.0, lat: 0.0 };
 
   return (
     <>
