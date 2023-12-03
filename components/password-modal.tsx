@@ -10,72 +10,33 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
 } from "@chakra-ui/react";
 
 import { useUpdatePassword } from "@/lib/hooks/userHooks";
 import { TModalProps } from "@/lib/types";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function PasswordModal({ isOpen, onClose }: TModalProps) {
   const { data: session } = useSession();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmedNewPassword, setConfirmedNewPassword] = useState("");
-  const toast = useToast();
 
-  const {
-    mutate: updatePassword,
-    data: updatePasswordResponse,
-    isSuccess,
-    isLoading,
-  } = useUpdatePassword(onClose);
-
-  const passwordChangeErrorToast = () => {
-    toast({
-      title: "Wystąpił problem.",
-      description: "Zmiana hasła nie powiodła się.",
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const passwordChangeSuccessToast = () => {
-    toast({
-      title: "Sukces.",
-      description: "Hasło zostało zmienione.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
+  const { mutate: updatePassword, isLoading } = useUpdatePassword(onClose);
 
   const onSave = () => {
     if (session?.user.email && session.user.email !== "") {
       return updatePassword({
-        email: session?.user.email ?? "",
+        email: session.user.email,
         passwords: {
           currentPassword: currentPassword,
           newPassword: newPassword,
           confirmedNewPassword: confirmedNewPassword,
         },
       });
-    } else {
-      passwordChangeErrorToast();
     }
   };
-
-  useEffect(() => {
-    if (isSuccess && updatePasswordResponse?.data.success) {
-      passwordChangeSuccessToast();
-    }
-
-    if (isSuccess && !updatePasswordResponse?.data.success) {
-      passwordChangeErrorToast();
-    }
-  }, [isSuccess]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>

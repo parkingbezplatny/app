@@ -14,63 +14,28 @@ import {
 
 import { useUpdateUsername } from "@/lib/hooks/userHooks";
 import { TModalProps } from "@/lib/types";
-import { useToast } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function UsernameModal({ isOpen, onClose }: TModalProps) {
   const { data: session, update: updateSession } = useSession();
   const [username, setUsername] = useState(session?.user.username ?? "");
-  const toast = useToast();
 
-  const {
-    mutate: updateUsername,
-    data: updateUsernameResponse,
-    isSuccess,
-    isLoading,
-  } = useUpdateUsername(onClose);
-
-  const usernameChangeErrorToast = () => {
-    toast({
-      title: "Wystąpił problem.",
-      description: "Zmiana nazwy użytkownika nie powiodła się.",
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
+  const onSuccess = () => {
+    updateSession();
+    onClose();
   };
 
-  const usernameChangeSuccessToast = () => {
-    toast({
-      title: "Sukces.",
-      description: "Nazwa użytkownika została zmieniona.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
+  const { mutate: updateUsername, isLoading } = useUpdateUsername(onSuccess);
 
   const onSave = () => {
     if (session?.user.email && session.user.email !== "") {
       updateUsername({
-        email: session?.user.email ?? "",
+        email: session.user.email,
         username: username,
       });
-    } else {
-      usernameChangeErrorToast();
     }
   };
-
-  useEffect(() => {
-    if (isSuccess && updateUsernameResponse?.data.success) {
-      updateSession();
-      usernameChangeSuccessToast();
-    }
-
-    if (isSuccess && !updateUsernameResponse?.data.success) {
-      usernameChangeErrorToast();
-    }
-  }, [isSuccess, updateUsernameResponse]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>

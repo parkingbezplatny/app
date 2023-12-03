@@ -10,9 +10,8 @@ import {
   ModalOverlay,
   Text,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 
 type Props = {
@@ -21,45 +20,10 @@ type Props = {
 
 function DeleteParkingModal({ parkingId }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
 
   const initialRef = useRef(null);
 
-  const deleteParkingErrorToast = () => {
-    toast({
-      title: "Wystąpił problem.",
-      description: "Usuwanie parkingu nie powiodło się.",
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const deleteParkingSuccessToast = () => {
-    toast({
-      title: "Sukces.",
-      description: "Pomyślnie usunięto parking.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const {
-    mutate: deleteParking,
-    data: deleteParkingResponse,
-    isSuccess,
-  } = useDeleteParking(onClose);
-
-  useEffect(() => {
-    if (isSuccess && deleteParkingResponse?.data.success) {
-      deleteParkingSuccessToast();
-    }
-
-    if (isSuccess && !deleteParkingResponse?.data.success) {
-      deleteParkingErrorToast();
-    }
-  }, [isSuccess, deleteParkingResponse]);
+  const { mutate: deleteParking } = useDeleteParking(onClose);
 
   function onDelete() {
     deleteParking(parkingId.toString());

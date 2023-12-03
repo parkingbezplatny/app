@@ -1,5 +1,5 @@
 import { useGetParking, useUpdateParking } from "@/lib/hooks/parkingHooks";
-import { TUpdateParking } from "@/lib/types";
+import { TParking, TUpdateParking } from "@/lib/types";
 import { UpdateParkingValidation } from "@/lib/validations/forms/updateParking.validation";
 import {
   Button,
@@ -10,7 +10,6 @@ import {
   Heading,
   Input,
   Stack,
-  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -21,11 +20,32 @@ type Props = {
   onClose: () => void;
 };
 
+const mapParkingToUpdateParking = (parking: TParking): TUpdateParking => {
+  const { coordinates } = parking.geometry;
+  const { properties } = parking;
+  return {
+    geometry: {
+      lat: coordinates[0].toString(),
+      lng: coordinates[1].toString(),
+    },
+    properties: {
+      address: {
+        city: properties.address.city,
+        countryName: properties.address.countryName,
+        county: properties.address.county,
+        label: properties.address.label,
+        postalCode: properties.address.postalCode,
+        state: properties.address.state,
+        houseNumber: properties.address.houseNumber ?? undefined,
+        street: properties.address.street ?? undefined,
+      },
+    },
+  };
+};
+
 function UpdateParkingForm({ parkingId, onClose }: Props) {
-  const [parkingDefaultValues, setParkingDefaultValues] = useState<
-    TUpdateParking | {}
-  >({});
-  const toast = useToast();
+  const [parkingDefaultValues, setParkingDefaultValues] =
+    useState<TUpdateParking>();
   const {
     register,
     handleSubmit,
@@ -40,54 +60,18 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
 
   useEffect(() => {
     if (parkingResponse?.data) {
-      setParkingDefaultValues(parkingResponse.data);
+      setParkingDefaultValues(mapParkingToUpdateParking(parkingResponse.data));
     }
   }, [parkingResponse]);
 
-  const updateParkingErrorToast = () => {
-    toast({
-      title: "Wystąpił problem.",
-      description: "Aktualizowanie parkingu nie powiodło się.",
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const updateParkingSuccessToast = () => {
-    toast({
-      title: "Sukces.",
-      description: "Pomyślnie zaktualizowano parking.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const {
-    mutate: updateParking,
-    data: updateParkingResponse,
-    isSuccess,
-  } = useUpdateParking(onClose);
+  const { mutate: updateParking } = useUpdateParking(onClose);
 
   const onSubmit = (data: TUpdateParking) => {
-    if (Object.keys(errors).length === 0) {
-      updateParking({
-        id: parkingId.toString(),
-        updateParking: data,
-      });
-    }
+    updateParking({
+      id: parkingId.toString(),
+      updateParking: data,
+    });
   };
-
-  useEffect(() => {
-    if (isSuccess && updateParkingResponse?.data.success) {
-      updateParkingSuccessToast();
-    }
-
-    if (isSuccess && !updateParkingResponse?.data.success) {
-      updateParkingErrorToast();
-    }
-  }, [isSuccess, updateParkingResponse]);
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>

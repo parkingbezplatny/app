@@ -11,10 +11,9 @@ import {
   Heading,
   Input,
   Stack,
-  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface CreateParkingFormProps {
@@ -22,7 +21,6 @@ interface CreateParkingFormProps {
 }
 
 function CreateParkingForm({ onClose }: CreateParkingFormProps) {
-  const toast = useToast();
   const [createParkingError, setCreateParkingError] = useState<string>("");
   const {
     register,
@@ -39,47 +37,11 @@ function CreateParkingForm({ onClose }: CreateParkingFormProps) {
     },
   });
 
-  const createParkingErrorToast = () => {
-    toast({
-      title: "Wystąpił problem.",
-      description: "Dodawanie parkingu nie powiodło się.",
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const createParkingSuccessToast = () => {
-    toast({
-      title: "Sukces.",
-      description: "Pomyślnie dodano parking.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-  };
-
-  const {
-    mutate: createParking,
-    data: createParkingResponse,
-    isSuccess,
-  } = useCreateParking(onClose);
+  const { mutate: createParking } = useCreateParking(onClose);
 
   const onSubmit = async (data: TCreateParking) => {
-    if (Object.keys(errors).length === 0) {
-      createParking(data);
-    }
+    createParking(data);
   };
-
-  useEffect(() => {
-    if (isSuccess && createParkingResponse?.data.success) {
-      createParkingSuccessToast();
-    }
-
-    if (isSuccess && !createParkingResponse?.data.success) {
-      createParkingErrorToast();
-    }
-  }, [isSuccess, createParkingResponse]);
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>
