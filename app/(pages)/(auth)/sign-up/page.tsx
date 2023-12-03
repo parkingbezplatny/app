@@ -44,11 +44,9 @@ export default function SignUp() {
   } = useSignUp();
 
   const onSubmit = async (data: TSignUpForm) => {
-    if (Object.keys(errors).length === 0) {
-      credentialsSignUp(data);
-      setEmail(data.email);
-      setPassword(data.passwords.password);
-    }
+    credentialsSignUp(data);
+    setEmail(data.email);
+    setPassword(data.passwords.password);
   };
 
   useEffect(() => {
