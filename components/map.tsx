@@ -5,12 +5,7 @@ import { createRoot } from "react-dom/client";
 
 import MapTooltip from "./map-tooltip";
 
-export type TMapProps = {
-  lng: number;
-  lat: number;
-};
-
-export default function Map({ lng, lat }: TMapProps) {
+export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
   const [zoom] = useState(10);
@@ -23,7 +18,7 @@ export default function Map({ lng, lat }: TMapProps) {
     map.current = new maplibregl.Map({
       container: mapContainer.current as HTMLDivElement,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
-      center: [lng, lat],
+      center: [18.0, 51.0],
       zoom: zoom,
     });
 
@@ -167,7 +162,7 @@ export default function Map({ lng, lat }: TMapProps) {
         map.current.getCanvas().style.cursor = "";
       });
     });
-  }, [API_KEY, lng, lat, zoom]);
+  }, [API_KEY, zoom]);
 
   return (
     <div className="map-wrap">

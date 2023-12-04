@@ -1,6 +1,11 @@
-import { getErrorMessage } from "../helpers/errorMessage";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
-import { ErrorServerFunctionResponse, ExceptionServerFunctionResponse, ServerFunctionResponse, SuccessServerFunctionResponse } from "../helpers/server-function-response";
+import {
+  ErrorServerFunctionResponse,
+  ExceptionServerFunctionResponse,
+  ServerFunctionResponse,
+  SuccessServerFunctionResponse,
+} from "../helpers/server-function-response";
 import prisma from "../prisma/prismaClient";
 import {
   TSignUpForm,
@@ -104,7 +109,9 @@ export async function signInWithCredential(
   }
 }
 
-export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFunctionResponse<TUser | null>> {
+export async function signUpWithCreadential(
+  user: TSignUpForm
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const getUserByEmailResponse = await getUserByEmail(user.email);
     const userExist = getUserByEmailResponse.data;
@@ -137,9 +144,15 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFu
       },
     });
 
-    if (!newUser) return new ErrorServerFunctionResponse("Błąd tworzenia nowego użytkownika");
+    if (!newUser)
+      return new ErrorServerFunctionResponse(
+        "Błąd tworzenia nowego użytkownika"
+      );
 
-    return new SuccessServerFunctionResponse("Utworzono konto użytkownika", newUser);
+    return new SuccessServerFunctionResponse(
+      "Utworzono konto użytkownika",
+      newUser
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -147,7 +160,9 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<ServerFu
   }
 }
 
-export async function getUserByEmail(userEmail: string): Promise<ServerFunctionResponse<TUser | null>> {
+export async function getUserByEmail(
+  userEmail: string
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -164,8 +179,7 @@ export async function getUserByEmail(userEmail: string): Promise<ServerFunctionR
       },
     });
 
-    if (!user) 
-    {
+    if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
     }
 
@@ -177,7 +191,9 @@ export async function getUserByEmail(userEmail: string): Promise<ServerFunctionR
   }
 }
 
-export async function getUserById(userId: string): Promise<ServerFunctionResponse<TUser | null>> {
+export async function getUserById(
+  userId: string
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -194,8 +210,7 @@ export async function getUserById(userId: string): Promise<ServerFunctionRespons
       },
     });
 
-    if (!user) 
-    {
+    if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
     }
 
@@ -239,7 +254,9 @@ export async function getUsersWithPagination(
   }
 }
 
-export async function getUsers(): Promise<ServerFunctionResponse<TUser[] | null>> {
+export async function getUsers(): Promise<
+  ServerFunctionResponse<TUser[] | null>
+> {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -254,14 +271,13 @@ export async function getUsers(): Promise<ServerFunctionResponse<TUser[] | null>
       orderBy: { id: "asc" },
     });
 
-    if (!users || users.length <= 0) 
-    {
+    if (!users || users.length <= 0) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkowników");
     }
 
     return new SuccessServerFunctionResponse("Znaleziono użytkowników", users);
   } catch (err: unknown) {
-    return new ExceptionServerFunctionResponse(getErrorMessage(err)); 
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -272,10 +288,10 @@ export async function updateUserByEmail(
   updateUser: TUpdateUserUsername
 ): Promise<ServerFunctionResponse<TUser | null>> {
   try {
-    const user = await getUserByEmail(userEmail); 
+    const user = await getUserByEmail(userEmail);
     if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
-    } 
+    }
 
     const updatedUser = await prisma.user.update({
       data: {
@@ -295,12 +311,16 @@ export async function updateUserByEmail(
       },
     });
 
-    if (!updatedUser) 
-    {
-      return new ErrorServerFunctionResponse("Błąd aktualizacji danych użytkownika");
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse(
+        "Błąd aktualizacji danych użytkownika"
+      );
     }
 
-    return new SuccessServerFunctionResponse("Zaktualizowano dane użytkownika", updatedUser);
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano dane użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -314,8 +334,7 @@ export async function updateUserById(
 ): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await getUserById(userId);
-    if (!user) 
-    {
+    if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
     }
 
@@ -337,12 +356,16 @@ export async function updateUserById(
       },
     });
 
-    if (!updatedUser) 
-    {
-      return new ErrorServerFunctionResponse("Błąd aktualizacji danych użytkownika");
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse(
+        "Błąd aktualizacji danych użytkownika"
+      );
     }
 
-    return new SuccessServerFunctionResponse("Zaktualizowano dane użytkownika", updatedUser);
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano dane użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -361,8 +384,7 @@ export async function updateUserPasswordByEmail(
       },
     });
 
-    if (!user) 
-    {
+    if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
     }
     if (
@@ -370,9 +392,10 @@ export async function updateUserPasswordByEmail(
         updateUser.passwords.currentPassword,
         user.password
       ))
-    ) 
-    {
-      return new ErrorServerFunctionResponse("Aktualne hasło jest nieprawidłowe");
+    ) {
+      return new ErrorServerFunctionResponse(
+        "Aktualne hasło jest nieprawidłowe"
+      );
     }
 
     const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
@@ -395,12 +418,14 @@ export async function updateUserPasswordByEmail(
       },
     });
 
-    if (!updatedUser) 
-    {
+    if (!updatedUser) {
       return new ErrorServerFunctionResponse("Błąd zmiany hasła");
     }
 
-    return new SuccessServerFunctionResponse("Zaktualizowano hasło użytkownika", updatedUser);
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano hasło użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -411,7 +436,7 @@ export async function updateUserPasswordByEmail(
 export async function updateUserPasswordById(
   userId: string,
   updateUser: TUpdateUserPassword
-): Promise<ServerFunctionResponse<TUser|null>> {
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -419,8 +444,7 @@ export async function updateUserPasswordById(
       },
     });
 
-    if (!user) 
-    {
+    if (!user) {
       return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
     }
     if (
@@ -428,9 +452,10 @@ export async function updateUserPasswordById(
         updateUser.passwords.currentPassword,
         user.password
       ))
-    )
-    {
-      return new ErrorServerFunctionResponse("Aktualne hasło jest nieprawidłowe");
+    ) {
+      return new ErrorServerFunctionResponse(
+        "Aktualne hasło jest nieprawidłowe"
+      );
     }
 
     const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
@@ -453,12 +478,14 @@ export async function updateUserPasswordById(
       },
     });
 
-    if (!updatedUser)
-    {
+    if (!updatedUser) {
       return new ErrorServerFunctionResponse("Błąd zmiany hasła");
     }
 
-    return new SuccessServerFunctionResponse("Zaktualizowano hasło użytkownika", updatedUser);
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano hasło użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -523,7 +550,9 @@ export async function updateUserPasswordById(
 //   }
 // }
 
-export async function deleteUserByEmail(userEmail: string): Promise<ServerFunctionResponse<null>> {
+export async function deleteUserByEmail(
+  userEmail: string
+): Promise<ServerFunctionResponse<null>> {
   try {
     await prisma.user.delete({
       where: { email: userEmail },
@@ -536,7 +565,9 @@ export async function deleteUserByEmail(userEmail: string): Promise<ServerFuncti
   }
 }
 
-export async function deleteUserById(userId: string): Promise<ServerFunctionResponse<null>> {
+export async function deleteUserById(
+  userId: string
+): Promise<ServerFunctionResponse<null>> {
   try {
     await prisma.user.delete({
       where: { id: parseInt(userId) },

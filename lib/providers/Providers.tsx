@@ -8,8 +8,9 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
-import { getErrorMessage } from "../helpers/errorMessage";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { ApiResponse } from "../helpers/server-function-response";
+import { AxiosError, AxiosResponse } from "axios";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const toast = useToast();
@@ -17,28 +18,35 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient({
     queryCache: new QueryCache({
       onError: (err: unknown) => {
-        toast({
-          title: getErrorMessage(err),
-          status: "error",
-          isClosable: true,
-        });
+        if (err instanceof AxiosError) {
+          const data = err.response?.data as ApiResponse<unknown>;
+          toast({
+            title: getErrorMessage(data.message),
+            status: "error",
+            isClosable: true,
+          });
+        }
       },
     }),
     mutationCache: new MutationCache({
       onError: (err: unknown) => {
-        toast({
-          title: getErrorMessage(err),
-          status: "error",
-          isClosable: true,
-        });
+        if (err instanceof AxiosError) {
+          const data = err.response?.data as ApiResponse<unknown>;
+          toast({
+            title: getErrorMessage(data.message),
+            status: "error",
+            isClosable: true,
+          });
+        }
       },
       onSuccess: (data: unknown) => {
+        const dataResponse = data as AxiosResponse;
+        const dataFromResponse = dataResponse.data as ApiResponse<unknown>;
         toast({
-          title: (data as ApiResponse<unknown>).message,
+          title: getErrorMessage(dataFromResponse.message),
           status: "success",
           isClosable: true,
         });
-        queryClient.invalidateQueries();
       },
     }),
   });

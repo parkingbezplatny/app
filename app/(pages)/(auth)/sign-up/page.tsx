@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { useSignUp } from "@/lib/hooks/authHooks";
 import { TSignUpForm } from "@/lib/types";
 import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
@@ -20,49 +18,32 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SignUp() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [signUpError, setSignUpError] = useState<string>("");
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<TSignUpForm>({
     resolver: zodResolver(SignUpValidation),
     mode: "onChange",
   });
 
-  const {
-    mutate: credentialsSignUp,
-    data: credentialsSignUpResponse,
-    isSuccess,
-    isLoading,
-  } = useSignUp();
+  const { mutate: credentialsSignUp, isSuccess, isLoading } = useSignUp();
 
   const onSubmit = async (data: TSignUpForm) => {
     credentialsSignUp(data);
-    setEmail(data.email);
-    setPassword(data.passwords.password);
+    if (isSuccess) router.push("/sign-in");
   };
 
   useEffect(() => {
-    if (isSuccess && !credentialsSignUpResponse.data.success) {
-      setSignUpError(credentialsSignUpResponse.data.message);
-    }
-
-    if (isSuccess && credentialsSignUpResponse.data.success) {
-      signIn("credentials", {
-        email: email,
-        password: password,
-        callbackUrl: "/dashboard",
-      });
-    }
-  }, [credentialsSignUpResponse]);
-
+    if (isSuccess) router.push("/sign-in");
+  }, [isSuccess]);
   return (
     <Flex
       minH={"90dvh"}
@@ -82,19 +63,6 @@ export default function SignUp() {
             Zarejestruj się
           </Heading>
           <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-            {signUpError && (
-              <Box
-                w="100%"
-                p={4}
-                border="1px"
-                borderColor="red.400"
-                rounded={10}
-                color="red.600"
-                fontWeight="semibold"
-              >
-                {signUpError}
-              </Box>
-            )}
             <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={4} w={{ base: 300, sm: 400 }}>
                 <FormControl id="email" isInvalid={!!errors.email}>
@@ -173,7 +141,7 @@ export default function SignUp() {
                     bg: "#C05621",
                   }}
                   textColor="white"
-                  isLoading={isSubmitting}
+                  isLoading={isLoading}
                 >
                   Zarejestruj się
                 </Button>

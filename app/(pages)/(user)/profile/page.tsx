@@ -28,7 +28,7 @@ export default function Profile() {
 
   const favoriteParkingsIds =
     session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
-  const { data: parkingsQueryResult, isSuccess } =
+  const { data: parkingsQueryResult } =
     useGetFavoriteParkings(favoriteParkingsIds);
 
   const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;

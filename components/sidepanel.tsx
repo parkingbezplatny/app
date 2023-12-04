@@ -10,28 +10,23 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import CreateParkingModal from "./parking/create-parking-modal";
+import { useSession } from "next-auth/react";
+import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 
-export interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
-export interface Parking {
-  name: string;
-  coordinates: Coordinates;
-  city: string;
-}
-
-interface SidePanelProps {
-  tab: string;
-  setTab: React.Dispatch<React.SetStateAction<string>>;
-  parkings: Parking[];
-}
-
-const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
+const SidePanel = () => {
   const createParkingModal = useDisclosure();
+  const [tab, setTab] = useState("favorites");
+
+  const { data: session } = useSession();
+  const favoriteParkingsIds =
+    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+  const { data: parkingsQueryResult, isSuccess } =
+    useGetFavoriteParkings(favoriteParkingsIds);
+
+  const favoriteParkings =
+    parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
   return (
     <Box
@@ -84,7 +79,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
             Ulubione
           </Heading>
           <List mb={5}>
-            {parkings.map((parking) => (
+            {favoriteParkings.map((parking) => (
               <React.Fragment key={parking.name}>
                 <Divider mb={2} borderColor="gray.200" />
                 <Text fontWeight={"semibold"}>{parking.name}</Text>
@@ -112,24 +107,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
           />
         </>
       )}
-
-      <Button
-        mt="auto"
-        bg="orange.500"
-        _hover={{
-          bg: "orange.600",
-        }}
-        textColor="white"
-        borderRadius="md"
-        onClick={createParkingModal.onOpen}
-      >
-        Dodaj
-      </Button>
-      <CreateParkingModal
-        onOpen={createParkingModal.onOpen}
-        isOpen={createParkingModal.isOpen}
-        onClose={createParkingModal.onClose}
-      />
     </Box>
   );
 };

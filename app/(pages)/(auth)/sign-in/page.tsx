@@ -22,7 +22,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 
@@ -31,8 +30,6 @@ function SignIn() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
-
-  console.log(error);
 
   const {
     register,
@@ -56,12 +53,6 @@ function SignIn() {
       callbackUrl: "/dashboard",
     });
   };
-
-  useEffect(() => {
-    if (session) {
-      router.replace("/dashboard");
-    }
-  }, [session]);
 
   return (
     <Flex

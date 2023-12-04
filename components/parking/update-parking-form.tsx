@@ -44,8 +44,8 @@ const mapParkingToUpdateParking = (parking: TParking): TUpdateParking => {
 };
 
 function UpdateParkingForm({ parkingId, onClose }: Props) {
-  const [parkingDefaultValues, setParkingDefaultValues] =
-    useState<TUpdateParking>();
+  const { data: parkingResponse } = useGetParking(parkingId.toString());
+
   const {
     register,
     handleSubmit,
@@ -53,10 +53,21 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
   } = useForm<TUpdateParking>({
     resolver: zodResolver(UpdateParkingValidation),
     mode: "onChange",
-    defaultValues: parkingDefaultValues,
+    // defaultValues: parkingDefaultValues,
+    defaultValues: {
+      ...parkingResponse?.data,
+      geometry: {
+        lat: parkingResponse?.data?.geometry.coordinates[0].toString(),
+        lng: parkingResponse?.data?.geometry.coordinates[1].toString(),
+      },
+      properties: {
+        address: {
+          ...parkingResponse?.data?.properties.address,
+          // street: parkingResponse?.data?.properties.address.city | null
+        },
+      },
+    },
   });
-
-  const { data: parkingResponse } = useGetParking(parkingId.toString());
 
   useEffect(() => {
     if (parkingResponse?.data) {

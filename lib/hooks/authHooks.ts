@@ -3,11 +3,11 @@ import agent from "../api/agent";
 import { TSignUpForm } from "../types";
 
 function signUp(signUpForm: TSignUpForm) {
-    return agent.Auth.signUpWithCredentials(signUpForm);
-  }
+  return agent.Auth.signUpWithCredentials(signUpForm);
+}
 
 export const useSignUp = () => {
-    return useMutation({
-        mutationFn: signUp,
-      });
-}
+  return useMutation({
+    mutationFn: signUp,
+  });
+};

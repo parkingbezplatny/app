@@ -1,6 +1,9 @@
+"use client";
+
 import {
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Modal,
@@ -13,26 +16,39 @@ import {
 } from "@chakra-ui/react";
 
 import { useUpdateUsername } from "@/lib/hooks/userHooks";
-import { TModalProps } from "@/lib/types";
+import { TModalProps, TUpdateUserUsername } from "@/lib/types";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UpdateUserUsernameValidation } from "@/lib/validations/forms/updateUserUsername.validation";
 
 export default function UsernameModal({ isOpen, onClose }: TModalProps) {
   const { data: session, update: updateSession } = useSession();
-  const [username, setUsername] = useState(session?.user.username ?? "");
 
   const onSuccess = () => {
     updateSession();
     onClose();
   };
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<TUpdateUserUsername>({
+    resolver: zodResolver(UpdateUserUsernameValidation),
+    mode: "onChange",
+    defaultValues: {
+      username: session?.user.username,
+    },
+  });
+
   const { mutate: updateUsername, isLoading } = useUpdateUsername(onSuccess);
 
-  const onSave = () => {
+  const onSave = (values: TUpdateUserUsername) => {
     if (session?.user.email && session.user.email !== "") {
       updateUsername({
         email: session.user.email,
-        username: username,
+        username: values.username,
       });
     }
   };
@@ -41,36 +57,43 @@ export default function UsernameModal({ isOpen, onClose }: TModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent mx={2}>
-        <ModalHeader>Zmień nazwę użytkownika</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <FormControl>
-            <FormLabel>Nowa nazwa użytkownika</FormLabel>
-            <Input
-              focusBorderColor="orange.400"
-              placeholder="Nazwa użytkownika"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </FormControl>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            bg="orange.500"
-            _hover={{
-              bg: "orange.600",
-            }}
-            textColor="white"
-            mr={3}
-            onClick={onSave}
-            isLoading={isLoading}
-          >
-            Zapisz
-          </Button>
-          <Button variant="ghost" onClick={onClose}>
-            Anuluj
-          </Button>
-        </ModalFooter>
+        <form onSubmit={handleSubmit(onSave)}>
+          <ModalHeader>Zmień nazwę użytkownika</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl id="username" isInvalid={!!errors.username}>
+              <FormLabel>Nowa nazwa użytkownika</FormLabel>
+              <Input
+                focusBorderColor="orange.400"
+                placeholder="Nazwa użytkownika"
+                {...register("username", {
+                  required: {
+                    value: true,
+                    message: "Nazwa użytkownika jest wymagana",
+                  },
+                })}
+              />
+              <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              bg="orange.500"
+              _hover={{
+                bg: "orange.600",
+              }}
+              textColor="white"
+              mr={3}
+              type="submit"
+              isLoading={isLoading}
+            >
+              Zapisz
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              Anuluj
+            </Button>
+          </ModalFooter>
+        </form>
       </ModalContent>
     </Modal>
   );

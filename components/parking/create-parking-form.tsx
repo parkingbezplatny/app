@@ -21,7 +21,6 @@ interface CreateParkingFormProps {
 }
 
 function CreateParkingForm({ onClose }: CreateParkingFormProps) {
-  const [createParkingError, setCreateParkingError] = useState<string>("");
   const {
     register,
     handleSubmit,
@@ -45,19 +44,6 @@ function CreateParkingForm({ onClose }: CreateParkingFormProps) {
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-      {createParkingError && (
-        <Box
-          w="100%"
-          p={4}
-          border="1px"
-          borderColor="red.400"
-          rounded={10}
-          color="red.600"
-          fontWeight="semibold"
-        >
-          {createParkingError}
-        </Box>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={4} w={{ base: 300, sm: 400 }}>
           <FormControl id="type" isInvalid={!!errors.type}>
