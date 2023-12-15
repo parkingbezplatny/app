@@ -14,7 +14,7 @@ import React from "react";
 function Admin() {
   return (
     <Flex direction="column" gap="2rem">
-      <Heading>Admin Dashboard</Heading>
+      <Heading>Panel administratora</Heading>
       <Grid
         templateColumns={{
           base: "repeat(1, 1fr)",
@@ -26,14 +26,21 @@ function Admin() {
         <GridItem>
           <AdminCard
             header={"Zarządzaj użytkownikami"}
-            body={
-              <Text>
-                Tutaj możesz przeglądać, usuwać i zmieniać role użytkowników
-              </Text>
-            }
+            body={<Text>Przeglądaj, usuwaj i zmieniaj role użytkowników.</Text>}
             footer={
               <Link href="/admin/user">
-                <Button variant="ghost" minW="100px">
+                <Button
+                  border="1px"
+                  borderColor="gray.400"
+                  bg="transparent"
+                  _hover={{
+                    bg: "#C05621",
+                    textColor: "white",
+                    border: "1px solid white",
+                  }}
+                  textColor="black"
+                  minW="100px"
+                >
                   Zarządzaj
                 </Button>
               </Link>
@@ -44,13 +51,22 @@ function Admin() {
           <AdminCard
             header={"Zarządzaj parkingami"}
             body={
-              <Text>
-                Tutaj możesz przeglądać, usuwać, edytować i tworzyć parkingi
-              </Text>
+              <Text>Przeglądaj, usuwaj, edytuj i twórz nowe parkingi.</Text>
             }
             footer={
               <Link href="/admin/parking">
-                <Button variant="ghost" minW="100px">
+                <Button
+                  border="1px"
+                  borderColor="gray.400"
+                  bg="transparent"
+                  _hover={{
+                    bg: "#C05621",
+                    textColor: "white",
+                    border: "1px solid white",
+                  }}
+                  textColor="black"
+                  minW="100px"
+                >
                   Zarządzaj
                 </Button>
               </Link>
