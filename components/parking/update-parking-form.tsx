@@ -44,7 +44,7 @@ const mapParkingToUpdateParking = (parking: TParking): TUpdateParking => {
 };
 
 function UpdateParkingForm({ parkingId, onClose }: Props) {
-  const { data: parkingResponse } = useGetParking(parkingId.toString());
+  const { data: parkingResponse } = useGetParking(parkingId ? parkingId.toString() : '');
 
   const {
     register,
@@ -57,13 +57,14 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
     defaultValues: {
       ...parkingResponse?.data,
       geometry: {
-        lat: parkingResponse?.data?.geometry.coordinates[0].toString(),
-        lng: parkingResponse?.data?.geometry.coordinates[1].toString(),
+        lat: parkingResponse?.data?.geometry?.coordinates?.[0]?.toString() || '',
+        lng: parkingResponse?.data?.geometry?.coordinates?.[1]?.toString() || '',
       },
       properties: {
         address: {
-          ...parkingResponse?.data?.properties.address,
-          // street: parkingResponse?.data?.properties.address.city | null
+          ...parkingResponse?.data?.properties?.address,
+          street: parkingResponse?.data?.properties?.address?.street || undefined,
+          houseNumber: parkingResponse?.data?.properties?.address?.houseNumber || undefined,
         },
       },
     },
@@ -71,7 +72,7 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
 
   useEffect(() => {
     if (parkingResponse?.data) {
-      setParkingDefaultValues(mapParkingToUpdateParking(parkingResponse.data));
+      //setParkingDefaultValues(mapParkingToUpdateParking(parkingResponse.data));
     }
   }, [parkingResponse]);
 
@@ -132,7 +133,7 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
               placeholder="Wpisz powiat"
               focusBorderColor="orange.400"
               {...register("properties.address.county", {
-                required: { value: true, message: "Województwo jest wymagany" },
+                required: { value: true, message: "Powiat jest wymagany" },
               })}
             />
             <FormErrorMessage>
@@ -239,12 +240,12 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
             <Input
               type="number"
               step="any"
-              placeholder="Wpisz lat"
+              placeholder="Wpisz szerokość geograficzną"
               focusBorderColor="orange.400"
               {...register("geometry.lat", {
                 required: {
                   value: true,
-                  message: "Lat jest wymagane",
+                  message: "Szerokość geograficzna jest wymagana",
                 },
               })}
             />
@@ -256,12 +257,12 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
             <Input
               type="number"
               step="any"
-              placeholder="Wpisz lng"
+              placeholder="Wpisz długość geograficzną"
               focusBorderColor="orange.400"
               {...register("geometry.lng", {
                 required: {
                   value: true,
-                  message: "Lng jest wymagane",
+                  message: "Długość geograficzna jest wymagana",
                 },
               })}
             />
