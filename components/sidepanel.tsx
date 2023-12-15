@@ -8,15 +8,12 @@ import {
   Input,
   List,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import CreateParkingModal from "./parking/create-parking-modal";
 import { useSession } from "next-auth/react";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 
 const SidePanel = () => {
-  const createParkingModal = useDisclosure();
   const [tab, setTab] = useState("favorites");
 
   const { data: session } = useSession();
