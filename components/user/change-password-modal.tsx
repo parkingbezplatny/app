@@ -17,12 +17,11 @@ import {
 import { useUpdatePassword } from "@/lib/hooks/userHooks";
 import { TModalProps, TUpdateUserPassword } from "@/lib/types";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { UpdateUserPasswordValidation } from "@/lib/validations/forms/updateUserPassword.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function PasswordModal({ isOpen, onClose }: TModalProps) {
+export default function ChangePasswordModal({ isOpen, onClose }: TModalProps) {
   const { data: session, update: updateSession } = useSession();
 
   const {

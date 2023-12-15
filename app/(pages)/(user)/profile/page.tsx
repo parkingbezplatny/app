@@ -1,8 +1,8 @@
 "use client";
 
 import Navbar from "@/components/navbar";
-import PasswordModal from "@/components/password-modal";
-import UsernameModal from "@/components/username-modal";
+import ChangePasswordModal from "@/components/user/change-password-modal";
+import ChangeUsernameModal from "@/components/user/change-username-modal";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import {
   Avatar,
@@ -130,11 +130,11 @@ export default function Profile() {
           ))}
         </SimpleGrid>
       </Box>
-      <UsernameModal
+      <ChangeUsernameModal
         isOpen={usernameModal.isOpen}
         onClose={usernameModal.onClose}
       />
-      <PasswordModal
+      <ChangePasswordModal
         isOpen={passwordModal.isOpen}
         onClose={passwordModal.onClose}
       />

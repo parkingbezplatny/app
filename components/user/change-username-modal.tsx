@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateUserUsernameValidation } from "@/lib/validations/forms/updateUserUsername.validation";
 
-export default function UsernameModal({ isOpen, onClose }: TModalProps) {
+export default function ChangeUsernameModal({ isOpen, onClose }: TModalProps) {
   const { data: session, update: updateSession } = useSession();
 
   const onSuccess = () => {
