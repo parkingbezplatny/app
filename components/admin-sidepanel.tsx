@@ -1,55 +1,54 @@
-"use client";
-
 import React from "react";
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, IconButton } from "@chakra-ui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FaHome, FaUser, FaParking } from 'react-icons/fa'; // Import your icons here
 
 function AdminSidePanel() {
   const pathname = usePathname();
 
-  console.log(pathname);
   return (
     <Box
       p={2}
-      minW="230px"
-      height="calc(100dvh - 83px)"
+      height="100dvh"
       borderRight="1px solid #A0AEC0"
       bg="white"
     >
       <Flex direction={"column"} gap={"1rem"} boxSizing={"border-box"}>
-        <Heading size="sm">Admin panel</Heading>
         <Link href="/admin">
-          <Flex
-            p={2}
-            w={"min-content"}
-            borderBottom={pathname === "/admin" ? "2px solid orange" : ""}
+          <IconButton
+            aria-label="Dashboard"
+            icon={<FaHome />}
+            borderBottom={pathname === "/admin" ? "2px solid #ED8936" : ""}
             mb={pathname === "/admin" ? "" : "2px"}
-          >
-            Dashboard
-          </Flex>
+            _hover={{
+              bg: "orange.300",
+            }}
+          />
         </Link>
         <Link href="/admin/user">
-          <Flex
-            p={2}
-            w={"min-content"}
-            borderBottom={pathname.includes("user") ? "2px solid orange" : ""}
+          <IconButton
+            aria-label="Users"
+            icon={<FaUser />}
+            borderBottom={pathname.includes("user") ? "2px solid #ED8936" : ""}
             mb={pathname.includes("user") ? "" : "2px"}
-          >
-            Użytkownicy
-          </Flex>
+            _hover={{
+              bg: "orange.300",
+            }}
+          />
         </Link>
         <Link href="/admin/parking">
-          <Flex
-            p={2}
-            w={"min-content"}
+          <IconButton
+            aria-label="Parkings"
+            icon={<FaParking />}
             borderBottom={
-              pathname.includes("parking") ? "2px solid orange" : ""
+              pathname.includes("parking") ? "2px solid #ED8936" : ""
             }
             mb={pathname.includes("parking") ? "" : "2px"}
-          >
-            Parkingi
-          </Flex>
+            _hover={{
+              bg: "orange.300",
+            }}
+          />
         </Link>
       </Flex>
     </Box>

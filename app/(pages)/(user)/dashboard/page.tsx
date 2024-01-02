@@ -1,40 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, useBreakpointValue, Slide, IconButton } from "@chakra-ui/react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-
+import Map from "@/components/map";
+import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
 import Navbar from "components/navbar";
 import SidePanel from "components/sidepanel";
-import Map from "@/components/map";
+import { useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function Dashboard() {
-  const [tab, setTab] = useState("favorites");
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
-
-  const parkings = [
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-  ];
+  const [selectedPointOnMap, setSelectedPointOnMap] = useState<number[]>([
+    19.0, 51.5,
+  ]);
 
   return (
     <>
@@ -51,7 +29,7 @@ function Dashboard() {
             direction="left"
             in={true}
           >
-            <SidePanel tab={tab} setTab={setTab} parkings={parkings} />
+            <SidePanel setSelectedPointOnMap={setSelectedPointOnMap} />
           </Slide>
         ) : null}
         {!isLargerThanLG && (
@@ -70,10 +48,7 @@ function Dashboard() {
           />
         )}
         <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          <Map
-            lng={parkings[0].coordinates.lng}
-            lat={parkings[0].coordinates.lat}
-          />
+          <Map selectedPointOnMap={selectedPointOnMap} />
         </Box>
       </Box>
     </>

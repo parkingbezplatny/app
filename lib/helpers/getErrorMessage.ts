@@ -8,7 +8,7 @@ export function getErrorMessage(error: unknown): string {
   } else if (typeof error === "string") {
     message = error;
   } else {
-    message = "Coś poszło nie tak";
+    message = "";
   }
 
   return message;

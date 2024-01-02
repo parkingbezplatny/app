@@ -1,5 +1,11 @@
-import { getErrorMessage } from "../helpers/errorMessage";
+import { getErrorMessage } from "../helpers/getErrorMessage";
 import { comparePassword, hashPassword } from "../helpers/password";
+import {
+  ErrorServerFunctionResponse,
+  ExceptionServerFunctionResponse,
+  ServerFunctionResponse,
+  SuccessServerFunctionResponse,
+} from "../helpers/server-function-response";
 import prisma from "../prisma/prismaClient";
 import {
   TSignUpForm,
@@ -90,8 +96,12 @@ export async function signInWithCredential(
     if (!(await comparePassword(password, user.password)))
       throw new Error("Nieprawidłowe dane logowania");
 
-    const u = await getUserByEmail(email);
-    return u;
+    const getUserByEmailResponse = await getUserByEmail(email);
+    if (getUserByEmailResponse.data === null) {
+      throw new Error(getUserByEmailResponse.message);
+    }
+
+    return getUserByEmailResponse.data;
   } catch (err: unknown) {
     throw err;
   } finally {
@@ -99,15 +109,18 @@ export async function signInWithCredential(
   }
 }
 
-export async function signUpWithCreadential(user: TSignUpForm): Promise<TUser> {
+export async function signUpWithCreadential(
+  user: TSignUpForm
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
-    const userExist = await getUserByEmail(user.email);
+    const getUserByEmailResponse = await getUserByEmail(user.email);
+    const userExist = getUserByEmailResponse.data;
     if (userExist) {
       if (userExist.isGoogle)
-        throw new Error(
+        return new ErrorServerFunctionResponse(
           "Konto o tym adresie email już istnieje. Spróbuj się zalogować używając przycisku Google."
         );
-      throw new Error("Użytkownik już istnieje");
+      return new ErrorServerFunctionResponse("Użytkownik już istnieje");
     }
 
     const hashedPassword = await hashPassword(user.passwords.password);
@@ -131,17 +144,25 @@ export async function signUpWithCreadential(user: TSignUpForm): Promise<TUser> {
       },
     });
 
-    if (!newUser) throw new Error("Błąd tworzenia nowego użytkownika");
+    if (!newUser)
+      return new ErrorServerFunctionResponse(
+        "Błąd tworzenia nowego użytkownika"
+      );
 
-    return newUser;
+    return new SuccessServerFunctionResponse(
+      "Utworzono konto użytkownika",
+      newUser
+    );
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getUserByEmail(userEmail: string): Promise<TUser> {
+export async function getUserByEmail(
+  userEmail: string
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -158,17 +179,21 @@ export async function getUserByEmail(userEmail: string): Promise<TUser> {
       },
     });
 
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
-    return user;
+    return new SuccessServerFunctionResponse("Znaleziono użytkownika", user);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getUserById(userId: string): Promise<TUser> {
+export async function getUserById(
+  userId: string
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -185,11 +210,13 @@ export async function getUserById(userId: string): Promise<TUser> {
       },
     });
 
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
-    return user;
+    return new SuccessServerFunctionResponse("Znaleziono użytkownika", user);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -198,7 +225,7 @@ export async function getUserById(userId: string): Promise<TUser> {
 export async function getUsersWithPagination(
   skip: number,
   take: number
-): Promise<TUser[]> {
+): Promise<ServerFunctionResponse<TUser[] | null>> {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -215,18 +242,21 @@ export async function getUsersWithPagination(
       skip: skip,
     });
 
-    if (!users || users.length <= 0)
-      throw new Error("Nie znaleziono użytkowników");
+    if (!users || users.length <= 0) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkowników");
+    }
 
-    return users;
+    return new SuccessServerFunctionResponse("Znaleziono użytkowników", users);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function getUsers(): Promise<TUser[]> {
+export async function getUsers(): Promise<
+  ServerFunctionResponse<TUser[] | null>
+> {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -241,12 +271,13 @@ export async function getUsers(): Promise<TUser[]> {
       orderBy: { id: "asc" },
     });
 
-    if (!users || users.length <= 0)
-      throw new Error("Nie znaleziono użytkowników");
+    if (!users || users.length <= 0) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkowników");
+    }
 
-    return users;
+    return new SuccessServerFunctionResponse("Znaleziono użytkowników", users);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -255,10 +286,12 @@ export async function getUsers(): Promise<TUser[]> {
 export async function updateUserByEmail(
   userEmail: string,
   updateUser: TUpdateUserUsername
-): Promise<TUser> {
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await getUserByEmail(userEmail);
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
     const updatedUser = await prisma.user.update({
       data: {
@@ -278,10 +311,18 @@ export async function updateUserByEmail(
       },
     });
 
-    if (!updatedUser) throw new Error("Błąd aktualizacji danych użytkownika");
-    return updatedUser;
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse(
+        "Błąd aktualizacji danych użytkownika"
+      );
+    }
+
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano dane użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -290,10 +331,12 @@ export async function updateUserByEmail(
 export async function updateUserById(
   userId: string,
   updateUser: TUpdateUserUsername
-): Promise<TUser> {
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await getUserById(userId);
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
 
     const updatedUser = await prisma.user.update({
       data: {
@@ -313,10 +356,18 @@ export async function updateUserById(
       },
     });
 
-    if (!updatedUser) throw new Error("Błąd aktualizacji danych użytkownika");
-    return updatedUser;
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse(
+        "Błąd aktualizacji danych użytkownika"
+      );
+    }
+
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano dane użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -325,7 +376,7 @@ export async function updateUserById(
 export async function updateUserPasswordByEmail(
   userEmail: string,
   updateUser: TUpdateUserPassword
-): Promise<TUser> {
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -333,14 +384,19 @@ export async function updateUserPasswordByEmail(
       },
     });
 
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
     if (
       !(await comparePassword(
         updateUser.passwords.currentPassword,
         user.password
       ))
-    )
-      throw new Error("Aktualne hasło jest nieprawidłowe");
+    ) {
+      return new ErrorServerFunctionResponse(
+        "Aktualne hasło jest nieprawidłowe"
+      );
+    }
 
     const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
 
@@ -362,10 +418,16 @@ export async function updateUserPasswordByEmail(
       },
     });
 
-    if (!updatedUser) throw new Error("Błąd zmiany hasła");
-    return updatedUser;
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse("Błąd zmiany hasła");
+    }
+
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano hasło użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -374,7 +436,7 @@ export async function updateUserPasswordByEmail(
 export async function updateUserPasswordById(
   userId: string,
   updateUser: TUpdateUserPassword
-): Promise<TUser> {
+): Promise<ServerFunctionResponse<TUser | null>> {
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -382,14 +444,19 @@ export async function updateUserPasswordById(
       },
     });
 
-    if (!user) throw new Error("Nie znaleziono użytkownika");
+    if (!user) {
+      return new ErrorServerFunctionResponse("Nie znaleziono użytkownika");
+    }
     if (
       !(await comparePassword(
         updateUser.passwords.currentPassword,
         user.password
       ))
-    )
-      throw new Error("Aktualne hasło jest nieprawidłowe");
+    ) {
+      return new ErrorServerFunctionResponse(
+        "Aktualne hasło jest nieprawidłowe"
+      );
+    }
 
     const hashedPassword = await hashPassword(updateUser.passwords.newPassword);
 
@@ -411,10 +478,16 @@ export async function updateUserPasswordById(
       },
     });
 
-    if (!updatedUser) throw new Error("Błąd zmiany hasła");
-    return updatedUser;
+    if (!updatedUser) {
+      return new ErrorServerFunctionResponse("Błąd zmiany hasła");
+    }
+
+    return new SuccessServerFunctionResponse(
+      "Zaktualizowano hasło użytkownika",
+      updatedUser
+    );
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
@@ -477,27 +550,31 @@ export async function updateUserPasswordById(
 //   }
 // }
 
-export async function deleteUserByEmail(userEmail: string): Promise<boolean> {
+export async function deleteUserByEmail(
+  userEmail: string
+): Promise<ServerFunctionResponse<null>> {
   try {
     await prisma.user.delete({
       where: { email: userEmail },
     });
-    return true;
+    return new SuccessServerFunctionResponse("Usunięto użytkownika", null);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }
 }
 
-export async function deleteUserById(userId: string): Promise<boolean> {
+export async function deleteUserById(
+  userId: string
+): Promise<ServerFunctionResponse<null>> {
   try {
     await prisma.user.delete({
       where: { id: parseInt(userId) },
     });
-    return true;
+    return new SuccessServerFunctionResponse("Usunięto użytkownika", null);
   } catch (err: unknown) {
-    throw getErrorMessage(err);
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
     await prisma.$disconnect();
   }

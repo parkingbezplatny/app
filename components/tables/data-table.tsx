@@ -53,6 +53,7 @@ export function DataTable<TData, TValue>({
         {type === "parking" && (
           <Input
             maxW="300px"
+            focusBorderColor="orange.400"
             placeholder="Szukaj po miejscowości..."
             value={
               (table
@@ -70,6 +71,7 @@ export function DataTable<TData, TValue>({
           <Input
             maxW="300px"
             placeholder="Szukaj po email..."
+            focusBorderColor="orange.400"
             value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
             onChange={(e) =>
               table.getColumn("email")?.setFilterValue(e.target.value)
@@ -131,6 +133,7 @@ export function DataTable<TData, TValue>({
               {table.getPageCount()}
             </Text>
             <NumberInput
+              focusBorderColor="orange.400"
               onChange={(e) => {
                 if (parseInt(e) >= 0) table.setPageIndex(parseInt(e) - 1);
                 else table.setPageIndex(0);
