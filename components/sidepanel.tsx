@@ -5,7 +5,6 @@ import {
   Divider,
   HStack,
   Heading,
-  Input,
   List,
   Text,
 } from "@chakra-ui/react";
@@ -80,14 +79,18 @@ const SidePanel = ({
           <Heading as="h3" size="md" mb={4}>
             Ulubione
           </Heading>
-          <List mb={5}>
-            {favoriteParkings.map((parking) => (
-              <React.Fragment key={parking.properties.address.label}>
-                <Divider mb={2} borderColor="gray.200" />
-              </React.Fragment>
-            ))}
-          </List>
           <Divider mb={2} borderColor="gray.200" />
+          {favoriteParkings.length > 0 ? (
+            <List mb={5}>
+              {favoriteParkings.map((parking) => (
+                <React.Fragment key={parking.properties.address.label}>
+                  <Divider mb={2} borderColor="gray.200" />
+                </React.Fragment>
+              ))}
+            </List>
+          ) : (
+            <Text>Nie posiadasz jeszcze ulubionych parkingów.</Text>
+          )}
         </>
       )}
 
