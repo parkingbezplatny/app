@@ -6,6 +6,8 @@ import { createRoot } from "react-dom/client";
 
 import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
+import axios from "axios";
+import { ApiResponse } from "@/lib/helpers/server-function-response";
 
 interface MapData {
   type: string;
@@ -44,9 +46,10 @@ export default function Map({
   const [zoom] = useState(5);
   const [API_KEY] = useState(`${process.env.NEXT_PUBLIC_MAP_API_KEY}`);
 
-  const { data: parkingsForMapQueryResult } = useGetParkingsForMap();
+  const { data: parkingsForMapQueryResult, status } = useGetParkingsForMap();
 
   useEffect(() => {
+    if (status !== "success") return;
     // Stops map from intializing more than once
     if (map.current) return;
 
@@ -82,14 +85,14 @@ export default function Map({
         );
 
         console.log(parkingsForMapQueryResult?.data);
+
         // Add geo data to map
         map.current.addSource("places", {
           type: "geojson",
           // example data TODO fetch from API
           data: {
             type: "FeatureCollection",
-            features:
-              parkingsForMapQueryResult?.data?.map(mapDbParkingToMapData) ?? [],
+            features: parkingsForMapQueryResult?.data ?? [],
           },
           cluster: true,
           clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -200,7 +203,7 @@ export default function Map({
         map.current.getCanvas().style.cursor = "";
       });
     });
-  }, [API_KEY, zoom, parkingsForMapQueryResult]);
+  }, [API_KEY, zoom, parkingsForMapQueryResult, status]);
 
   useEffect(() => {
     if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
