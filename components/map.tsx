@@ -179,7 +179,7 @@ export default function Map({
 
         const popup = document.createElement("div");
         createRoot(popup).render(
-          <MapTooltip parkingId={id} parkingLabel={label} />
+          <MapTooltip parkingId={id} parkingLabel={label} parkingCoordinates={[coordinates[0], coordinates[1]]}/>
         );
 
         new maplibregl.Popup({
