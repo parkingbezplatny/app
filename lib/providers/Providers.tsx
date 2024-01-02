@@ -42,7 +42,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       onSuccess: (data: unknown) => {
         const dataResponse = data as AxiosResponse;
         const dataFromResponse = dataResponse.data as ApiResponse<unknown>;
-        console.log(dataFromResponse);
         toast({
           title: getErrorMessage(dataFromResponse.message),
           status: "success",
