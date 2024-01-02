@@ -9,11 +9,16 @@ import {
   List,
   Text,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
+import Search from "./search";
 
-const SidePanel = () => {
+const SidePanel = ({
+  setSelectedPointOnMap,
+}: {
+  setSelectedPointOnMap: Dispatch<SetStateAction<number[]>>;
+}) => {
   const [tab, setTab] = useState("favorites");
 
   const { data: session } = useSession();
@@ -92,17 +97,7 @@ const SidePanel = () => {
       )}
 
       {tab === "search" && (
-        <>
-          <Heading as="h3" size="md" mb={4}>
-            Wyszukaj
-          </Heading>
-          <Input
-            placeholder="Wyszukaj parking..."
-            borderColor="#d8dce4"
-            focusBorderColor="orange.500"
-            mb={5}
-          />
-        </>
+        <Search setSelectedPointOnMap={setSelectedPointOnMap} />
       )}
     </Box>
   );

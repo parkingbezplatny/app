@@ -5,10 +5,14 @@ import { createRoot } from "react-dom/client";
 
 import MapTooltip from "./map-tooltip";
 
-export default function Map() {
+export default function Map({
+  selectedPointOnMap,
+}: {
+  selectedPointOnMap: number[];
+}) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
-  const [zoom] = useState(10);
+  const [zoom] = useState(5);
   const [API_KEY] = useState(`${process.env.NEXT_PUBLIC_MAP_API_KEY}`);
 
   useEffect(() => {
@@ -18,7 +22,7 @@ export default function Map() {
     map.current = new maplibregl.Map({
       container: mapContainer.current as HTMLDivElement,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
-      center: [18.0, 51.0],
+      center: [19.0, 51.5],
       zoom: zoom,
     });
 
@@ -163,6 +167,15 @@ export default function Map() {
       });
     });
   }, [API_KEY, zoom]);
+
+  useEffect(() => {
+    if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
+      return;
+    if (map.current) {
+      map.current.setCenter(selectedPointOnMap as LngLatLike);
+      map.current.setZoom(14);
+    }
+  }, [selectedPointOnMap]);
 
   return (
     <div className="map-wrap">

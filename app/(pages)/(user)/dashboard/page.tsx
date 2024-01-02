@@ -10,6 +10,9 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 function Dashboard() {
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
+  const [selectedPointOnMap, setSelectedPointOnMap] = useState<number[]>([
+    19.0, 51.5,
+  ]);
 
   return (
     <>
@@ -26,7 +29,7 @@ function Dashboard() {
             direction="left"
             in={true}
           >
-            <SidePanel />
+            <SidePanel setSelectedPointOnMap={setSelectedPointOnMap} />
           </Slide>
         ) : null}
         {!isLargerThanLG && (
@@ -45,7 +48,7 @@ function Dashboard() {
           />
         )}
         <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          <Map />
+          <Map selectedPointOnMap={selectedPointOnMap} />
         </Box>
       </Box>
     </>
