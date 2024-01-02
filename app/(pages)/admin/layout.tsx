@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, useBreakpointValue, Slide, IconButton } from "@chakra-ui/react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React from "react";
+import { Box } from "@chakra-ui/react";
 
 import Navbar from "components/navbar";
 import AdminSidePanel from "@/components/admin-sidepanel";

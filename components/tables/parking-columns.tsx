@@ -1,10 +1,8 @@
 "use client";
 
-import { TParking, TParkingMap } from "@/lib/types";
-import { Button, Flex } from "@chakra-ui/react";
+import { TParking } from "@/lib/types";
+import { Flex } from "@chakra-ui/react";
 import { ColumnDef } from "@tanstack/react-table";
-import { FiEdit } from "react-icons/fi";
-import { AiOutlineDelete } from "react-icons/ai";
 import UpdateParkingModal from "../parking/update-parking-modal";
 import DeleteParkingModal from "../parking/delete-parking-modal";
 
