@@ -69,7 +69,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: TModalProps) {
                 <FormLabel>Aktualne hasło</FormLabel>
                 <Input
                   focusBorderColor="orange.400"
-                  placeholder="Aktualne hasło"
+                  placeholder="Podaj aktualne hasło"
                   type="password"
                   {...register("passwords.currentPassword", {
                     required: {
@@ -87,10 +87,10 @@ export default function ChangePasswordModal({ isOpen, onClose }: TModalProps) {
                 id="passwords.newPassword"
                 isInvalid={!!errors.passwords?.newPassword}
               >
-                <FormLabel>Nowe hasło hasło</FormLabel>
+                <FormLabel>Nowe hasło</FormLabel>
                 <Input
                   focusBorderColor="orange.400"
-                  placeholder="Nowe hasło"
+                  placeholder="Podaj nowe hasło"
                   type="password"
                   {...register("passwords.newPassword", {
                     required: {
