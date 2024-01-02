@@ -65,3 +65,14 @@ export const useGetParking = (id: string) => {
         queryFn: () => getParking(id),
       });
 }
+
+function getParkingsForMap() {
+  return agent.Parkings.listForMap();
+}
+
+export const useGetParkingsForMap = () => {
+  return useQuery({
+    queryKey: ["parkingsForMap"],
+    queryFn: () => getParkingsForMap(),
+    });
+}
