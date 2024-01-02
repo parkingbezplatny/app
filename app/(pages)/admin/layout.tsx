@@ -10,7 +10,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <Box display="flex" height="calc(100dvh - 83px)">
+      <Box display="flex" minH="calc(100dvh - 83px)">
         <AdminSidePanel />
         <Box flex="1" p={5}>
           {children}

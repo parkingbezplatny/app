@@ -127,9 +127,9 @@ export function DataTable<TData, TValue>({
           direction="row"
           w="100%"
           justify="space-between"
-          mb="1rem"
           gap="1rem"
-          p="1rem"
+          px="1rem"
+          py={2}
         >
           <Flex direction="row" gap="1rem" align="center">
             <Text>
