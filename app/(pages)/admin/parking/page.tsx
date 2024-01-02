@@ -7,7 +7,7 @@ import { useGetAllParkings } from "@/lib/hooks/parkingHooks";
 import { Flex, Heading, useDisclosure } from "@chakra-ui/react";
 
 function AdminParking() {
-  const { data: parkings } = useGetAllParkings();
+  const { data: parkings, isLoading } = useGetAllParkings();
   const createParkingModal = useDisclosure();
 
   return (
@@ -19,6 +19,7 @@ function AdminParking() {
       <DataTable
         columns={parkingColumns}
         data={parkings ?? []}
+        isLoading={isLoading}
         type={"parking"}
       />
     </Flex>
