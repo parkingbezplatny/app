@@ -8,6 +8,7 @@ import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
 import axios from "axios";
 import { ApiResponse } from "@/lib/helpers/server-function-response";
+import { Spinner } from "@chakra-ui/react";
 
 interface MapData {
   type: string;
@@ -216,7 +217,9 @@ export default function Map({
 
   return (
     <div className="map-wrap">
-      <div ref={mapContainer} className="map" />
+      <div ref={mapContainer} className="map">
+        {status === "loading" && <Spinner />}
+      </div>
     </div>
   );
 }
