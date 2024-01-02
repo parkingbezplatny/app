@@ -1,20 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
-  Box,
-  useBreakpointValue,
-  Slide,
-  IconButton,
   Flex,
   Heading,
-  Button,
 } from "@chakra-ui/react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import CreateParkingModal from "@/components/parking/create-parking-modal";
 import { DataTable } from "@/components/tables/data-table";
-import { parkingColumns } from "@/components/tables/parking-columns";
-import { TParking, TParkingMap, TUser } from "@/lib/types";
+import { TUser } from "@/lib/types";
 import { userColumns } from "@/components/tables/user-columns";
 
 function AdminParking() {
@@ -36,7 +28,7 @@ function AdminParking() {
       <Flex direction="row" justify="space-between" align="center">
         <Heading>Zarządzasz użytkownikami</Heading>
       </Flex>
-      <DataTable columns={userColumns} data={users} type={"user"} />
+      <DataTable columns={userColumns} data={users} type={"user"} isLoading={false} />
     </Flex>
   );
 }
