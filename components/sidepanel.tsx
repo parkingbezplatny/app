@@ -82,13 +82,8 @@ const SidePanel = ({
           </Heading>
           <List mb={5}>
             {favoriteParkings.map((parking) => (
-              <React.Fragment key={parking.name}>
+              <React.Fragment key={parking.properties.address.label}>
                 <Divider mb={2} borderColor="gray.200" />
-                <Text fontWeight={"semibold"}>{parking.name}</Text>
-                <Text>{parking.city}</Text>
-                <Text fontSize={"sm"} fontStyle={"italic"} mb={3}>
-                  {parking.coordinates.lat}, {parking.coordinates.lng}
-                </Text>
               </React.Fragment>
             ))}
           </List>

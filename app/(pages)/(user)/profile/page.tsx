@@ -119,11 +119,8 @@ export default function Profile() {
                     fontSize="xs"
                     textTransform="uppercase"
                   >
-                    {parking.city}
+                    {parking.properties.address.label}
                   </Box>
-                </Box>
-                <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight">
-                  {parking.name}
                 </Box>
               </Box>
             </Box>
