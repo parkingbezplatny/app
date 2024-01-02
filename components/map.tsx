@@ -6,9 +6,7 @@ import { createRoot } from "react-dom/client";
 
 import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
-import axios from "axios";
-import { ApiResponse } from "@/lib/helpers/server-function-response";
-import { Spinner } from "@chakra-ui/react";
+import { Spinner, Flex, Text } from "@chakra-ui/react";
 
 interface MapData {
   type: string;
@@ -218,7 +216,30 @@ export default function Map({
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map">
-        {status === "loading" && <Spinner />}
+        {status === "loading" && (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            height="80dvh"
+            direction="column"
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              size="xl"
+              color="orange.500"
+            />
+            <Text
+              textAlign="center"
+              fontWeight="light"
+              fontSize={["md", "md", "xl"]}
+              mt={4}
+            >
+              Przygotowywanie mapy parkingów...
+            </Text>
+          </Flex>
+        )}
       </div>
     </div>
   );
