@@ -1,3 +1,4 @@
+import { useDeleteParking } from "@/lib/hooks/parkingHooks";
 import {
   Button,
   Flex,
@@ -22,11 +23,12 @@ function DeleteParkingModal({ parkingId }: Props) {
 
   const initialRef = useRef(null);
 
-  const deleteParking = async () => {
-    //TODO call to API for delete
-    alert(parkingId);
-    onClose();
-  };
+  const { mutate: deleteParking } = useDeleteParking(onClose);
+
+  function onDelete() {
+    deleteParking(parkingId.toString());
+  }
+
   return (
     <>
       <Button variant="ghost" onClick={onOpen}>
@@ -53,7 +55,7 @@ function DeleteParkingModal({ parkingId }: Props) {
                   _hover={{
                     bg: "orange.600",
                   }}
-                  onClick={deleteParking}
+                  onClick={onDelete}
                 >
                   Tak
                 </Button>

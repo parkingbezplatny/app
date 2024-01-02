@@ -1,19 +1,18 @@
-import React, { useRef, useEffect, useState } from "react";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
-import { createRoot } from "react-dom/client";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 
 import MapTooltip from "./map-tooltip";
 
-type TMapProps = {
-  lng: number;
-  lat: number;
-};
-
-export default function Map({ lng, lat }: TMapProps) {
+export default function Map({
+  selectedPointOnMap,
+}: {
+  selectedPointOnMap: number[];
+}) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
-  const [zoom] = useState(10);
+  const [zoom] = useState(5);
   const [API_KEY] = useState(`${process.env.NEXT_PUBLIC_MAP_API_KEY}`);
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export default function Map({ lng, lat }: TMapProps) {
     map.current = new maplibregl.Map({
       container: mapContainer.current as HTMLDivElement,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
-      center: [lng, lat],
+      center: [19.0, 51.5],
       zoom: zoom,
     });
 
@@ -167,7 +166,16 @@ export default function Map({ lng, lat }: TMapProps) {
         map.current.getCanvas().style.cursor = "";
       });
     });
-  }, [API_KEY, lng, lat, zoom]);
+  }, [API_KEY, zoom]);
+
+  useEffect(() => {
+    if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
+      return;
+    if (map.current) {
+      map.current.setCenter(selectedPointOnMap as LngLatLike);
+      map.current.setZoom(14);
+    }
+  }, [selectedPointOnMap]);
 
   return (
     <div className="map-wrap">

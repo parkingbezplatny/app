@@ -1,7 +1,7 @@
-import { TUpdateParking } from "@/lib/types";
+import { useGetParking, useUpdateParking } from "@/lib/hooks/parkingHooks";
+import { TParking, TUpdateParking } from "@/lib/types";
 import { UpdateParkingValidation } from "@/lib/validations/forms/updateParking.validation";
 import {
-  Box,
   Button,
   Divider,
   FormControl,
@@ -12,16 +12,40 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
   parkingId: number;
+  onClose: () => void;
 };
 
-function UpdateParkingForm({ parkingId }: Props) {
-  // TODO Fetch parking data by id
-  const [updateParkingError, setUpdateParkingError] = useState<string>("");
+const mapParkingToUpdateParking = (parking: TParking): TUpdateParking => {
+  const { coordinates } = parking.geometry;
+  const { properties } = parking;
+  return {
+    geometry: {
+      lat: coordinates[0].toString(),
+      lng: coordinates[1].toString(),
+    },
+    properties: {
+      address: {
+        city: properties.address.city,
+        countryName: properties.address.countryName,
+        county: properties.address.county,
+        label: properties.address.label,
+        postalCode: properties.address.postalCode,
+        state: properties.address.state,
+        houseNumber: properties.address.houseNumber ?? undefined,
+        street: properties.address.street ?? undefined,
+      },
+    },
+  };
+};
+
+function UpdateParkingForm({ parkingId, onClose }: Props) {
+  const { data: parkingResponse } = useGetParking(parkingId ? parkingId.toString() : '');
+
   const {
     register,
     handleSubmit,
@@ -29,33 +53,41 @@ function UpdateParkingForm({ parkingId }: Props) {
   } = useForm<TUpdateParking>({
     resolver: zodResolver(UpdateParkingValidation),
     mode: "onChange",
-    defaultValues: {},
+    // defaultValues: parkingDefaultValues,
+    defaultValues: {
+      ...parkingResponse?.data,
+      geometry: {
+        lat: parkingResponse?.data?.geometry?.coordinates?.[0]?.toString() || '',
+        lng: parkingResponse?.data?.geometry?.coordinates?.[1]?.toString() || '',
+      },
+      properties: {
+        address: {
+          ...parkingResponse?.data?.properties?.address,
+          street: parkingResponse?.data?.properties?.address?.street || undefined,
+          houseNumber: parkingResponse?.data?.properties?.address?.houseNumber || undefined,
+        },
+      },
+    },
   });
 
-  const updateParking = async (values: TUpdateParking) => {
-    setUpdateParkingError("");
-    // TODO Call to API with values
-    console.log(values);
-    alert(values);
-    setUpdateParkingError("TODO Call to API with values");
+  useEffect(() => {
+    if (parkingResponse?.data) {
+      //setParkingDefaultValues(mapParkingToUpdateParking(parkingResponse.data));
+    }
+  }, [parkingResponse]);
+
+  const { mutate: updateParking } = useUpdateParking(onClose);
+
+  const onSubmit = (data: TUpdateParking) => {
+    updateParking({
+      id: parkingId.toString(),
+      updateParking: data,
+    });
   };
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-      {updateParkingError && (
-        <Box
-          w="100%"
-          p={4}
-          border="1px"
-          borderColor="red.400"
-          rounded={10}
-          color="red.600"
-          fontWeight="semibold"
-        >
-          {updateParkingError}
-        </Box>
-      )}
-      <form onSubmit={handleSubmit(updateParking)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={4} w={{ base: 300, sm: 400 }}>
           <Heading size="md">Adres</Heading>
           <FormControl
@@ -101,7 +133,7 @@ function UpdateParkingForm({ parkingId }: Props) {
               placeholder="Wpisz powiat"
               focusBorderColor="orange.400"
               {...register("properties.address.county", {
-                required: { value: true, message: "Województwo jest wymagany" },
+                required: { value: true, message: "Powiat jest wymagany" },
               })}
             />
             <FormErrorMessage>
@@ -208,12 +240,12 @@ function UpdateParkingForm({ parkingId }: Props) {
             <Input
               type="number"
               step="any"
-              placeholder="Wpisz lat"
+              placeholder="Wpisz szerokość geograficzną"
               focusBorderColor="orange.400"
               {...register("geometry.lat", {
                 required: {
                   value: true,
-                  message: "Lat jest wymagane",
+                  message: "Szerokość geograficzna jest wymagana",
                 },
               })}
             />
@@ -225,12 +257,12 @@ function UpdateParkingForm({ parkingId }: Props) {
             <Input
               type="number"
               step="any"
-              placeholder="Wpisz lng"
+              placeholder="Wpisz długość geograficzną"
               focusBorderColor="orange.400"
               {...register("geometry.lng", {
                 required: {
                   value: true,
-                  message: "Lng jest wymagane",
+                  message: "Długość geograficzna jest wymagana",
                 },
               })}
             />

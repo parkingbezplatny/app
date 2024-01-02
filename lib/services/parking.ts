@@ -1,5 +1,10 @@
-import { getErrorMessage } from "../helpers/errorMessage";
-import { ErrorServerFunctionResponse, ExceptionServerFunctionResponse, ServerFunctionResponse, SuccessServerFunctionResponse } from "../helpers/server-function-response";
+import { getErrorMessage } from "../helpers/getErrorMessage";
+import {
+  ErrorServerFunctionResponse,
+  ExceptionServerFunctionResponse,
+  ServerFunctionResponse,
+  SuccessServerFunctionResponse,
+} from "../helpers/server-function-response";
 import prisma from "../prisma/prismaClient";
 import {
   TCreateParking,
@@ -47,7 +52,10 @@ export async function createParking(
       },
     });
 
-    return new SuccessServerFunctionResponse<TParking>("Pomyślnie dodano parking", newParking);
+    return new SuccessServerFunctionResponse<TParking>(
+      "Pomyślnie dodano parking",
+      newParking as TParking
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -55,7 +63,9 @@ export async function createParking(
   }
 }
 
-export async function getParkingById(id: string): Promise<ServerFunctionResponse<TParking | null>> {
+export async function getParkingById(
+  id: string
+): Promise<ServerFunctionResponse<TParking | null>> {
   try {
     if (id === "") {
       return new ErrorServerFunctionResponse("Id nie może być puste");
@@ -80,7 +90,10 @@ export async function getParkingById(id: string): Promise<ServerFunctionResponse
     if (!parking) {
       return new ErrorServerFunctionResponse("Nie znalezniono parkingu");
     }
-    return new SuccessServerFunctionResponse<TParking>("Znaleziono parking", parking);
+    return new SuccessServerFunctionResponse<TParking>(
+      "Znaleziono parking",
+      parking as TParking
+    );
   } catch (err) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -88,7 +101,9 @@ export async function getParkingById(id: string): Promise<ServerFunctionResponse
   }
 }
 
-export async function getParkingsForMap(): Promise<ServerFunctionResponse<TParkingMap[] | null>> {
+export async function getParkingsForMap(): Promise<
+  ServerFunctionResponse<TParkingMap[] | null>
+> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -114,7 +129,10 @@ export async function getParkingsForMap(): Promise<ServerFunctionResponse<TParki
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse<TParkingMap[]>("Znaleziono parkingi", parkings);
+    return new SuccessServerFunctionResponse<TParkingMap[]>(
+      "Znaleziono parkingi",
+      parkings
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -147,7 +165,10 @@ export async function getParkingsWithPagination(
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse<TParking[]>("Znaleziono parkingi", parkings);
+    return new SuccessServerFunctionResponse<TParking[]>(
+      "Znaleziono parkingi",
+      parkings as TParking[]
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -155,7 +176,9 @@ export async function getParkingsWithPagination(
   }
 }
 
-export async function getParkingsByCity(city: string): Promise<ServerFunctionResponse<TParking[] | null>> {
+export async function getParkingsByCity(
+  city: string
+): Promise<ServerFunctionResponse<TParking[] | null>> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -184,7 +207,10 @@ export async function getParkingsByCity(city: string): Promise<ServerFunctionRes
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);
+    return new SuccessServerFunctionResponse(
+      "Znaleziono parkingi",
+      parkings as TParking[]
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -192,7 +218,9 @@ export async function getParkingsByCity(city: string): Promise<ServerFunctionRes
   }
 }
 
-export async function getParkings(): Promise<ServerFunctionResponse<TParking[] | null>> {
+export async function getParkings(): Promise<
+  ServerFunctionResponse<TParking[] | null>
+> {
   try {
     const parkings = await prisma.parking.findMany({
       include: {
@@ -207,12 +235,14 @@ export async function getParkings(): Promise<ServerFunctionResponse<TParking[] |
       },
     });
 
-    if (!parkings)
-    {
+    if (!parkings) {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingów");
     }
 
-    return new SuccessServerFunctionResponse("Znaleziono parkingi", parkings);;
+    return new SuccessServerFunctionResponse(
+      "Znaleziono parkingi",
+      parkings as TParking[]
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -265,12 +295,16 @@ export async function updateParkingById(
       },
     });
 
-    if (!updatedParking) 
-    {
-      return new ErrorServerFunctionResponse("Błąd aktualizacji danych parkingu");
+    if (!updatedParking) {
+      return new ErrorServerFunctionResponse(
+        "Błąd aktualizacji danych parkingu"
+      );
     }
 
-    return new SuccessServerFunctionResponse("Pomyślnie zaktualizowano dane parkingu", updatedParking);
+    return new SuccessServerFunctionResponse(
+      "Pomyślnie zaktualizowano dane parkingu",
+      updatedParking as TParking
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -278,11 +312,12 @@ export async function updateParkingById(
   }
 }
 
-export async function deleteParkingById(parkingId: string): Promise<ServerFunctionResponse<null>> {
+export async function deleteParkingById(
+  parkingId: string
+): Promise<ServerFunctionResponse<null>> {
   try {
     const parking = (await getParkingById(parkingId)).data;
-    if (!parking) 
-    {
+    if (!parking) {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
     }
 
@@ -292,7 +327,10 @@ export async function deleteParkingById(parkingId: string): Promise<ServerFuncti
       },
     });
 
-    return new SuccessServerFunctionResponse("Pomyślnie usunięto parking", null);
+    return new SuccessServerFunctionResponse(
+      "Pomyślnie usunięto parking",
+      null
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -307,7 +345,7 @@ export async function rateParkingById(
 ): Promise<ServerFunctionResponse<TParking | null>> {
   try {
     const parking = (await getParkingById(parkingId)).data;
-    const user = (await getUserById(userId)).data; 
+    const user = (await getUserById(userId)).data;
 
     if (!parking) {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
@@ -350,12 +388,14 @@ export async function rateParkingById(
     }
 
     const rateParking = (await getParkingById(parkingId)).data;
-    if (!rateParking)
-    {
+    if (!rateParking) {
       return new ErrorServerFunctionResponse("Błąd oceniania parkingu");
     }
 
-    return new SuccessServerFunctionResponse("Pomyślnie oceniono parking", rateParking);
+    return new SuccessServerFunctionResponse(
+      "Pomyślnie oceniono parking",
+      rateParking
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -369,7 +409,7 @@ export async function addToFavoriteParkingById(
 ): Promise<ServerFunctionResponse<TParking | null>> {
   try {
     const parking = (await getParkingById(parkingId)).data;
-    const user = (await getUserById(userId)).data; 
+    const user = (await getUserById(userId)).data;
 
     if (!parking) {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
@@ -392,8 +432,7 @@ export async function addToFavoriteParkingById(
       },
     });
 
-    if (favoredParkingByUser) 
-    {
+    if (favoredParkingByUser) {
       return new ErrorServerFunctionResponse("Parking już jest w ulubionych");
     }
 
@@ -406,10 +445,15 @@ export async function addToFavoriteParkingById(
 
     const favoriteParking = (await getParkingById(parkingId)).data;
     if (!favoriteParking) {
-      return new ErrorServerFunctionResponse("Błąd dodawania parkingu do ulubionych");
+      return new ErrorServerFunctionResponse(
+        "Błąd dodawania parkingu do ulubionych"
+      );
     }
 
-    return new SuccessServerFunctionResponse("Pomyślnie dodano parking do ulubionych", favoriteParking);
+    return new SuccessServerFunctionResponse(
+      "Pomyślnie dodano parking do ulubionych",
+      favoriteParking
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {
@@ -423,7 +467,7 @@ export async function removeFromFavoriteParkingById(
 ): Promise<ServerFunctionResponse<null>> {
   try {
     const parking = (await getParkingById(parkingId)).data;
-    const user = (await getUserById(userId)).data; 
+    const user = (await getUserById(userId)).data;
 
     if (!parking) {
       return new ErrorServerFunctionResponse("Nie znaleziono parkingu");
@@ -446,8 +490,7 @@ export async function removeFromFavoriteParkingById(
       },
     });
 
-    if (!favoredParkingByUser) 
-    {
+    if (!favoredParkingByUser) {
       return new ErrorServerFunctionResponse("Parking nie jest w ulubionych");
     }
 
@@ -457,7 +500,10 @@ export async function removeFromFavoriteParkingById(
       },
     });
 
-    return new SuccessServerFunctionResponse("Pomyślnie usunięto parking z ulubionych", null); 
+    return new SuccessServerFunctionResponse(
+      "Pomyślnie usunięto parking z ulubionych",
+      null
+    );
   } catch (err: unknown) {
     return new ExceptionServerFunctionResponse(getErrorMessage(err));
   } finally {

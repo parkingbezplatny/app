@@ -1,41 +1,44 @@
-import React from "react";
 import {
   Box,
-  Center,
   Button,
-  HStack,
+  Center,
   Divider,
+  HStack,
   Heading,
+  Input,
   List,
   Text,
-  Input,
 } from "@chakra-ui/react";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
+import Search from "./search";
 
-interface Coordinates {
-  lat: number;
-  lng: number;
-}
+const SidePanel = ({
+  setSelectedPointOnMap,
+}: {
+  setSelectedPointOnMap: Dispatch<SetStateAction<number[]>>;
+}) => {
+  const [tab, setTab] = useState("favorites");
 
-interface Parking {
-  name: string;
-  coordinates: Coordinates;
-  city: string;
-}
+  const { data: session } = useSession();
+  const favoriteParkingsIds =
+    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+  const { data: parkingsQueryResult, isSuccess } =
+    useGetFavoriteParkings(favoriteParkingsIds);
 
-interface SidePanelProps {
-  tab: string;
-  setTab: React.Dispatch<React.SetStateAction<string>>;
-  parkings: Parking[];
-}
+  const favoriteParkings =
+    parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
-const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
   return (
     <Box
       minW="230px"
-      height="calc(100dvh - 83px)"
+      height="calc(100vh - 83px)"
       p={5}
       borderRight="1px solid #A0AEC0"
       bg="white"
+      display="flex"
+      flexDirection="column"
     >
       <Center justifyContent="space-evenly" mb={2}>
         <Button
@@ -78,14 +81,9 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
             Ulubione
           </Heading>
           <List mb={5}>
-            {parkings.map((parking) => (
-              <React.Fragment key={parking.name}>
+            {favoriteParkings.map((parking) => (
+              <React.Fragment key={parking.properties.address.label}>
                 <Divider mb={2} borderColor="gray.200" />
-                <Text fontWeight={"semibold"}>{parking.name}</Text>
-                <Text>{parking.city}</Text>
-                <Text fontSize={"sm"} fontStyle={"italic"} mb={3}>
-                  {parking.coordinates.lat}, {parking.coordinates.lng}
-                </Text>
               </React.Fragment>
             ))}
           </List>
@@ -94,17 +92,7 @@ const SidePanel: React.FC<SidePanelProps> = ({ tab, setTab, parkings }) => {
       )}
 
       {tab === "search" && (
-        <>
-          <Heading as="h3" size="md" mb={4}>
-            Wyszukaj
-          </Heading>
-          <Input
-            placeholder="Wyszukaj parking..."
-            borderColor="#d8dce4"
-            focusBorderColor="orange.500"
-            mb={5}
-          />
-        </>
+        <Search setSelectedPointOnMap={setSelectedPointOnMap} />
       )}
     </Box>
   );
