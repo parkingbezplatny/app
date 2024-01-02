@@ -1,44 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
-
+import { useSignUp } from "@/lib/hooks/authHooks";
+import { TSignUpForm } from "@/lib/types";
+import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
 import {
-  Flex,
   Box,
+  Button,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  Heading,
   Input,
   Link,
   Stack,
-  Button,
-  Heading,
   Text,
   useColorModeValue,
-  FormErrorMessage,
 } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpValidation } from "@/lib/validations/forms/signUp.validation";
-import { TSignUpForm } from "@/lib/types";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-function SignUp() {
-  const [signUpError, setSignUpError] = useState<string>("");
+export default function SignUp() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<TSignUpForm>({
     resolver: zodResolver(SignUpValidation),
     mode: "onChange",
   });
 
-  const credentialSignUp = async (values: TSignUpForm) => {
-    setSignUpError("");
-    // TODO Call to API with values
-    console.log(values);
-    setSignUpError("TODO Call to API with values");
+  const { mutate: credentialsSignUp, isSuccess, isLoading } = useSignUp();
+
+  const onSubmit = async (data: TSignUpForm) => {
+    credentialsSignUp(data);
+    if (isSuccess) router.push("/sign-in");
   };
 
+  useEffect(() => {
+    if (isSuccess) router.push("/sign-in");
+  }, [isSuccess]);
   return (
     <Flex
       minH={"90dvh"}
@@ -58,20 +63,7 @@ function SignUp() {
             Zarejestruj się
           </Heading>
           <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-            {signUpError && (
-              <Box
-                w="100%"
-                p={4}
-                border="1px"
-                borderColor="red.400"
-                rounded={10}
-                color="red.600"
-                fontWeight="semibold"
-              >
-                {signUpError}
-              </Box>
-            )}
-            <form onSubmit={handleSubmit(credentialSignUp)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={4} w={{ base: 300, sm: 400 }}>
                 <FormControl id="email" isInvalid={!!errors.email}>
                   <FormLabel fontSize="md">Email</FormLabel>
@@ -149,7 +141,7 @@ function SignUp() {
                     bg: "#C05621",
                   }}
                   textColor="white"
-                  isLoading={isSubmitting}
+                  isLoading={isLoading}
                 >
                   Zarejestruj się
                 </Button>
@@ -174,5 +166,3 @@ function SignUp() {
     </Flex>
   );
 }
-
-export default SignUp;

@@ -48,6 +48,7 @@ function SetUserAdminModal({ userId }: Props) {
                 <FormControl>
                   <FormLabel>Administrator</FormLabel>
                   <Select
+                    focusBorderColor="orange.400"
                     defaultValue={isAdmin}
                     onChange={(e) => {
                       setIsAdmin(e.target.value);

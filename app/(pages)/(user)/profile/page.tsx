@@ -1,95 +1,37 @@
 "use client";
 
+import Navbar from "@/components/navbar";
+import ChangePasswordModal from "@/components/user/change-password-modal";
+import ChangeUsernameModal from "@/components/user/change-username-modal";
+import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import {
-  Box,
-  Heading,
   Avatar,
+  Box,
   Button,
+  Flex,
+  Heading,
   IconButton,
   SimpleGrid,
   useBreakpointValue,
   useDisclosure,
-  Flex,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { FaTrash } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-
-
-import Navbar from "@/components/navbar";
-import UsernameModal from "@/components/username-modal";
-import PasswordModal from "@/components/password-modal";
+import { FaTrash } from "react-icons/fa";
 
 export default function Profile() {
   const { data: session } = useSession();
-  
+
   const columns = useBreakpointValue({ base: 1, md: 2, lg: 3 });
 
   const usernameModal = useDisclosure();
   const passwordModal = useDisclosure();
 
-  const parkings = [
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-    {
-      name: "Parking u Miecia",
-      coordinates: { lat: 51.11, lng: 17.0225 },
-      city: "Wrocław",
-    },
-    {
-      name: "Darmoowo",
-      coordinates: { lat: 50.0647, lng: 19.945 },
-      city: "Kraków",
-    },
-    {
-      name: "Free&Park",
-      coordinates: { lat: 10.012, lng: 13.342 },
-      city: "Lubin",
-    },
-    {
-      name: "Parkingowo",
-      coordinates: { lat: 80.047, lng: 9.212 },
-      city: "Zielona Góra",
-    },
-  ];
+  const favoriteParkingsIds =
+    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+  const { data: parkingsQueryResult } =
+    useGetFavoriteParkings(favoriteParkingsIds);
+
+  const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;
 
   return (
     <Box minH="100vh">
@@ -116,7 +58,7 @@ export default function Profile() {
           my={4}
         />
         <Heading size="md" mb={6}>
-        {session?.user?.username}
+          {session?.user?.username}
         </Heading>
         <Flex mb={4}>
           <Button
@@ -145,7 +87,7 @@ export default function Profile() {
         </Flex>
       </Box>
       <Box p={4}>
-      <SimpleGrid columns={columns} spacing={5}>
+        <SimpleGrid columns={columns} spacing={5}>
           {parkings.map((parking, index) => (
             <Box
               key={index}
@@ -177,19 +119,22 @@ export default function Profile() {
                     fontSize="xs"
                     textTransform="uppercase"
                   >
-                    {parking.city}
+                    {parking.properties.address.label}
                   </Box>
-                </Box>
-                <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight">
-                  {parking.name}
                 </Box>
               </Box>
             </Box>
           ))}
         </SimpleGrid>
       </Box>
-      <UsernameModal isOpen={usernameModal.isOpen} onClose={usernameModal.onClose} />
-      <PasswordModal isOpen={passwordModal.isOpen} onClose={passwordModal.onClose} />
+      <ChangeUsernameModal
+        isOpen={usernameModal.isOpen}
+        onClose={usernameModal.onClose}
+      />
+      <ChangePasswordModal
+        isOpen={passwordModal.isOpen}
+        onClose={passwordModal.onClose}
+      />
     </Box>
   );
 }

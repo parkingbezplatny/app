@@ -15,7 +15,6 @@ import CreateParkingModal from "@/components/parking/create-parking-modal";
 import { DataTable } from "@/components/tables/data-table";
 import { parkingColumns } from "@/components/tables/parking-columns";
 import { TParking, TParkingMap, TUser } from "@/lib/types";
-import * as json from "@/parkings/okJsonParkingList.json";
 import { userColumns } from "@/components/tables/user-columns";
 
 function AdminParking() {

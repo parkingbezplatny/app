@@ -1,3 +1,4 @@
+import { useCreateParking } from "@/lib/hooks/userHooks";
 import { TCreateParking } from "@/lib/types";
 import { CreateParkingValidation } from "@/lib/validations/forms/createParking.validation";
 import {
@@ -15,8 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-function CreateParkingForm() {
-  const [createParkingError, setCreateParkingError] = useState<string>("");
+interface CreateParkingFormProps {
+  onClose: () => void;
+}
+
+function CreateParkingForm({ onClose }: CreateParkingFormProps) {
   const {
     register,
     handleSubmit,
@@ -32,30 +36,15 @@ function CreateParkingForm() {
     },
   });
 
-  const createParking = async (values: TCreateParking) => {
-    setCreateParkingError("");
-    // TODO Call to API with values
-    console.log(values);
-    alert(values);
-    setCreateParkingError("TODO Call to API with values");
+  const { mutate: createParking } = useCreateParking(onClose);
+
+  const onSubmit = async (data: TCreateParking) => {
+    createParking(data);
   };
 
   return (
     <Stack spacing={4} w={{ base: 300, sm: 400 }}>
-      {createParkingError && (
-        <Box
-          w="100%"
-          p={4}
-          border="1px"
-          borderColor="red.400"
-          rounded={10}
-          color="red.600"
-          fontWeight="semibold"
-        >
-          {createParkingError}
-        </Box>
-      )}
-      <form onSubmit={handleSubmit(createParking)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={4} w={{ base: 300, sm: 400 }}>
           <FormControl id="type" isInvalid={!!errors.type}>
             <FormLabel fontSize="md">Typ</FormLabel>
