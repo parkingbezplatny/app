@@ -28,3 +28,11 @@ body {
 .maplibregl-ctrl-bottom-right{
   z-index: 0 !important;
 }
+
+::-webkit-scrollbar {
+  width: 0.2rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DD6B20;
+}
