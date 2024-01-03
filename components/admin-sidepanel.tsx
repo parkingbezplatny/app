@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Flex, IconButton } from "@chakra-ui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaHome, FaUser, FaParking } from 'react-icons/fa'; // Import your icons here
+import { FaHome, FaUser, FaParking } from 'react-icons/fa';
 
 function AdminSidePanel() {
   const pathname = usePathname();
@@ -10,7 +10,7 @@ function AdminSidePanel() {
   return (
     <Box
       p={2}
-      height="100dvh"
+      minH="calc(100dvh - 83px)"
       borderRight="1px solid #A0AEC0"
       bg="white"
     >

@@ -25,13 +25,17 @@ function mapParkings(response: ApiResponse<TParking[] | null>) {
   return parking;
 }
 
-export const useGetAllParkings = () => {
-  return useQuery({
-    queryKey: ["parkings"],
-    queryFn: getParkings,
-    select: mapParkings,
-  });
-};
+  export const useGetAllParkings = () => {
+    const { data, status } = useQuery({
+      queryKey: ["parkings"],
+      queryFn: getParkings,
+      select: mapParkings,
+    });
+  
+    const isLoading = status === 'loading';
+  
+    return { data, isLoading };
+  }
 
 function deleteParking(id: string) {
   return agent.Parkings.delete(id);

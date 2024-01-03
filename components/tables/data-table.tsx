@@ -1,17 +1,13 @@
 "use client";
 
 import {
-  Box,
+  Spinner,
   Button,
   Flex,
   Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
-  NumberInputStepper,
   Table,
-  TableContainer,
   Tbody,
   Td,
   Text,
@@ -32,12 +28,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   type: "parking" | "user";
+  isLoading: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   type,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -98,7 +96,13 @@ export function DataTable<TData, TValue>({
             ))}
           </Thead>
           <Tbody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <Tr>
+                <Td colSpan={columns.length}>
+                  <Spinner color="orange.500" />
+                </Td>
+              </Tr>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <Tr key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
@@ -123,14 +127,17 @@ export function DataTable<TData, TValue>({
           direction="row"
           w="100dvw"
           justify="space-between"
-          mb="1rem"
           gap="1rem"
-          p="1rem"
+          px="1rem"
+          py={2}
         >
           <Flex direction="row" gap="1rem" align="center">
             <Text>
-              {table.getState().pagination.pageIndex + 1} z{" "}
-              {table.getPageCount()}
+              {isLoading
+                ? "0 z 0"
+                : `${
+                    table.getState().pagination.pageIndex + 1
+                  } z ${table.getPageCount()}`}
             </Text>
             <NumberInput
               focusBorderColor="orange.400"
