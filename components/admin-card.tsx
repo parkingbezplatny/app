@@ -15,7 +15,7 @@ interface AdminCardProps {
 
 function AdminCard({ header, body, footer }: AdminCardProps) {
   return (
-    <Card border="1px solid #A0AEC0" boxShadow='lg' >
+    <Card border="1px" borderColor="gray.200" boxShadow='lg' >
       <CardHeader>
         <Heading size="md">{header}</Heading>
       </CardHeader>

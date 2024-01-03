@@ -1,9 +1,39 @@
+import { TParkingMap } from "@/lib/types";
 import maplibregl, { LngLatLike, Map as MapLibreGL } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 
+import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
+import { Spinner, Flex, Text } from "@chakra-ui/react";
+
+interface MapData {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: [number, number];
+  };
+  properties: {
+    name: string;
+  };
+}
+
+const mapDbParkingToMapData = (parking: TParkingMap): MapData => {
+  return {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [
+        parking.geometry!.coordinates[0],
+        parking.geometry!.coordinates[1],
+      ],
+    },
+    properties: {
+      name: parking!.properties!.address!.label,
+    },
+  };
+};
 
 export default function Map({
   selectedPointOnMap,
@@ -15,7 +45,10 @@ export default function Map({
   const [zoom] = useState(5);
   const [API_KEY] = useState(`${process.env.NEXT_PUBLIC_MAP_API_KEY}`);
 
+  const { data: parkingsForMapQueryResult, status } = useGetParkingsForMap();
+
   useEffect(() => {
+    if (status !== "success") return;
     // Stops map from intializing more than once
     if (map.current) return;
 
@@ -50,12 +83,15 @@ export default function Map({
           })
         );
 
+        console.log(parkingsForMapQueryResult?.data);
+
         // Add geo data to map
         map.current.addSource("places", {
           type: "geojson",
           // example data TODO fetch from API
           data: {
             type: "FeatureCollection",
+            features: parkingsForMapQueryResult?.data ?? [],
           },
           cluster: true,
           clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -143,7 +179,7 @@ export default function Map({
 
         const popup = document.createElement("div");
         createRoot(popup).render(
-          <MapTooltip parkingId={id} parkingLabel={label} />
+          <MapTooltip parkingId={id} parkingLabel={label} parkingCoordinates={[coordinates[0], coordinates[1]]}/>
         );
 
         new maplibregl.Popup({
@@ -166,7 +202,7 @@ export default function Map({
         map.current.getCanvas().style.cursor = "";
       });
     });
-  }, [API_KEY, zoom]);
+  }, [API_KEY, zoom, parkingsForMapQueryResult, status]);
 
   useEffect(() => {
     if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
@@ -179,7 +215,32 @@ export default function Map({
 
   return (
     <div className="map-wrap">
-      <div ref={mapContainer} className="map" />
+      <div ref={mapContainer} className="map">
+        {status === "loading" && (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            height="80dvh"
+            direction="column"
+          >
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              size="xl"
+              color="orange.500"
+            />
+            <Text
+              textAlign="center"
+              fontWeight="light"
+              fontSize={["md", "md", "xl"]}
+              mt={4}
+            >
+              Przygotowywanie mapy parkingów...
+            </Text>
+          </Flex>
+        )}
+      </div>
     </div>
   );
 }

@@ -125,7 +125,7 @@ export function DataTable<TData, TValue>({
         <Flex
           align="center"
           direction="row"
-          w="100%"
+          w="100dvw"
           justify="space-between"
           gap="1rem"
           px="1rem"
