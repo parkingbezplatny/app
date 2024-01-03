@@ -40,10 +40,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         }
       },
       onSuccess: (data: unknown) => {
-        const dataResponse = data as AxiosResponse;
-        const dataFromResponse = dataResponse.data as ApiResponse<unknown>;
+        let message = "";
+        if (typeof data === "object" && data !== null && "message" in data) {
+          message = data.message as string;
+        } else {
+          const dataResponse = data as AxiosResponse;
+          const dataFromResponse = dataResponse.data as ApiResponse<unknown>;
+          message = dataFromResponse.message;
+        }
         toast({
-          title: getErrorMessage(dataFromResponse.message),
+          title: getErrorMessage(message),
           status: "success",
           isClosable: true,
         });
