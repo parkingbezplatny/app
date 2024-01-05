@@ -1,3 +1,4 @@
+
 import maplibregl, {
   LngLatLike,
   MapGeoJSONFeature,
@@ -12,8 +13,10 @@ import { createRoot } from "react-dom/client";
 import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
 import { Spinner, Flex, Text } from "@chakra-ui/react";
+
 import { useSession } from "next-auth/react";
 import { useFavoriteMutation } from "@/lib/hooks/useFavoriteMutation";
+
 
 export default function Map({
   selectedPointOnMap,
@@ -106,6 +109,7 @@ export default function Map({
 
   useEffect(() => {
     if (status !== "success") return;
+
     if (map.current) return;
 
     map.current = new maplibregl.Map({
@@ -134,6 +138,7 @@ export default function Map({
             trackUserLocation: true,
           })
         );
+
 
         map.current.addSource("places", {
           type: "geojson",
@@ -200,6 +205,7 @@ export default function Map({
           },
         });
       });
+
 
       map.current.on("mouseenter", "places", () => {
         if (!map.current) return;

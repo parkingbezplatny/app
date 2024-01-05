@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -9,6 +10,7 @@ import {
   Flex,
   ChakraProvider,
 } from "@chakra-ui/react";
+
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
 import { Session } from "next-auth";
 
@@ -31,6 +33,7 @@ function MapTooltip({
   session, // handleSetPopupUpdate,
 }: MapTooltipProps) {
   const [isLoading, setIsLoading] = useState(false);
+
   const handleStarClick = () => {
     if (
       session?.user.favoriteParkings?.find(
@@ -47,7 +50,9 @@ function MapTooltip({
     // handleSetPopupUpdate();
   };
 
+
   const formattedCoordinates = parkingCoordinates!
+
     .map((coord) => coord.toFixed(6))
     .join(" ");
 
@@ -97,6 +102,7 @@ function MapTooltip({
         </Box>
       </Flex>
     </Flex>
+
   );
 }
 
