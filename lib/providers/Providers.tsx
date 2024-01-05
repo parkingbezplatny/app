@@ -30,14 +30,20 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     }),
     mutationCache: new MutationCache({
       onError: (err: unknown) => {
-        if (err instanceof AxiosError) {
-          const data = err.response?.data as ApiResponse<unknown>;
-          toast({
-            title: getErrorMessage(data.message),
-            status: "error",
-            isClosable: true,
-          });
+        let message = "";
+        if (err !== null && typeof err === "object" && "message" in err) {
+          message = err.message as string;
+        } else {
+          if (err instanceof AxiosError) {
+            const data = err.response?.data as ApiResponse<unknown>;
+            message = data.message;
+          }
         }
+        toast({
+          title: getErrorMessage(message),
+          status: "error",
+          isClosable: true,
+        });
       },
       onSuccess: (data: unknown) => {
         let message = "";

@@ -1,48 +1,102 @@
-import React, { useState } from "react";
-import { Box, IconButton, Text, HStack, Divider } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  IconButton,
+  Text,
+  HStack,
+  Divider,
+  Spinner,
+  Flex,
+  ChakraProvider,
+} from "@chakra-ui/react";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
+import { Session } from "next-auth";
+
+type MapTooltipProps = {
+  parkingId: number | undefined;
+  parkingLabel: string | undefined;
+  parkingCoordinates: number[] | undefined;
+  session: Session | null;
+  addParkingToFavorite: (parkingId: number) => Promise<void>;
+  removeParkingFromFavorite: (parkingId: number) => Promise<void>;
+  // handleSetPopupUpdate: () => void;
+};
 
 function MapTooltip({
   parkingId,
   parkingLabel,
   parkingCoordinates,
-}: {
-  parkingId: number;
-  parkingLabel: string;
-  parkingCoordinates: [number, number];
-}) {
-  const [isFavourite, setIsFavourite] = useState(false);
-
+  removeParkingFromFavorite,
+  addParkingToFavorite,
+  session, // handleSetPopupUpdate,
+}: MapTooltipProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const handleStarClick = () => {
-    setIsFavourite(!isFavourite);
-    alert(parkingId);
+    if (
+      session?.user.favoriteParkings?.find(
+        (parking) => parking.parkingId === parkingId
+      )
+    ) {
+      setIsLoading(true);
+      removeParkingFromFavorite(parkingId!);
+      // handleSetPopupUpdate();
+      return;
+    }
+    setIsLoading(true);
+    addParkingToFavorite(parkingId!);
+    // handleSetPopupUpdate();
   };
 
-  const formattedCoordinates = parkingCoordinates
+  const formattedCoordinates = parkingCoordinates!
     .map((coord) => coord.toFixed(6))
     .join(" ");
 
   return (
-    <Box px={5} w="225px" position="relative">
-      <HStack justifyContent="space-between">
-        <IconButton
-          position="absolute"
-          top={-4}
-          right={2}
-          fontSize="25px"
-          aria-label="Favourite icon"
-          icon={isFavourite ? <AiFillStar /> : <AiOutlineStar />}
-          color={isFavourite ? "#FFA500" : "grey"}
-          variant="outline"
-          onClick={handleStarClick}
-        />
-      </HStack>
-      <Text mr={20} fontSize={15}>{parkingLabel}</Text>
-      <Divider w="210px" my={4} border="1px solid #E2E8F0" />
-      <Text fontStyle="italic" color="grey">
-        {formattedCoordinates}
-      </Text>
-    </Box>
+    <Flex px="5px" w="225px">
+      <Flex w="100%" justify="space-between" gap="1rem">
+        <Box flex="9">
+          <Text fontSize={15}>{parkingLabel}</Text>
+          <Divider my={4} border="1px solid #E2E8F0" />
+          <Text fontStyle="italic" color="grey">
+            {formattedCoordinates}
+          </Text>
+        </Box>
+        <Box flex="1">
+          <Flex w="100%" align="center" justify="center">
+            {isLoading ? (
+              <IconButton
+                fontSize="25px"
+                aria-label="Loading"
+                icon={<Spinner w="25px" h="25px" />}
+              />
+            ) : (
+              <IconButton
+                fontSize="25px"
+                aria-label="Favourite icon"
+                icon={
+                  session?.user.favoriteParkings?.find(
+                    (parking) => parking.parkingId === parkingId
+                  ) ? (
+                    <AiFillStar />
+                  ) : (
+                    <AiOutlineStar />
+                  )
+                }
+                color={
+                  session?.user.favoriteParkings?.find(
+                    (parking) => parking.parkingId === parkingId
+                  )
+                    ? "#FFA500"
+                    : "grey"
+                }
+                variant="ghost"
+                onClick={handleStarClick}
+              />
+            )}
+          </Flex>
+        </Box>
+      </Flex>
+    </Flex>
   );
 }
 
