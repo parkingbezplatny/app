@@ -22,7 +22,7 @@ const SidePanel = ({
 
   const { data: session } = useSession();
   const favoriteParkingsIds =
-    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
+    session?.user.favoriteParkings?.map((parking) => parking.parkingId) ?? [];
   const { data: parkingsQueryResult, isSuccess } =
     useGetFavoriteParkings(favoriteParkingsIds);
 
@@ -83,7 +83,7 @@ const SidePanel = ({
           {favoriteParkings.length > 0 ? (
             <List mb={5}>
               {favoriteParkings.map((parking) => (
-                <React.Fragment key={parking.properties.address.label}>
+                <React.Fragment key={parking.id}>
                   <Divider mb={2} borderColor="gray.200" />
                 </React.Fragment>
               ))}
