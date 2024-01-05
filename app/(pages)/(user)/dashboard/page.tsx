@@ -1,7 +1,6 @@
 "use client";
 
 import Map from "@/components/map";
-import NewMap from "@/components/newMap";
 import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
 import Navbar from "components/navbar";
 import SidePanel from "components/sidepanel";
