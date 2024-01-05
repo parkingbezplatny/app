@@ -68,30 +68,30 @@ export const authOptions: NextAuthOptions = {
         if (account?.provider === "google") {
           const response = await getUserByEmail(user.email as string);
           const userExists = response.data;
-          if (!userExists) return token;
+          if (!userExists) return { ...token };
           token.user = { ...userExists };
-          return token;
+          return { ...token };
         }
         token.user = { ...user.user };
-        return token;
+        return { ...token };
       }
 
-      if (trigger === "update" && token?.user) {
+      if (trigger === "update") {
         const response = await getUserByEmail(token.user.email as string);
         const retrievedUser = response.data;
-        if (!retrievedUser) return token;
+        if (!retrievedUser) return { ...token };
         token.user = { ...retrievedUser };
-        return token;
+        return { ...token };
       }
 
-      return token;
+      return { ...token };
     },
 
     async session({ session, token }) {
       if (token) {
         session.user = { ...token.user };
       }
-      return session;
+      return { ...session };
     },
   },
 };
