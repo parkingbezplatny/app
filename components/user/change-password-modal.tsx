@@ -28,12 +28,14 @@ export default function ChangePasswordModal({ isOpen, onClose }: TModalProps) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<TUpdateUserPassword>({
     resolver: zodResolver(UpdateUserPasswordValidation),
     mode: "onChange",
   });
 
   const onSuccess = () => {
+    reset();
     updateSession();
     onClose();
   };
