@@ -25,17 +25,17 @@ function mapParkings(response: ApiResponse<TParking[] | null>) {
   return parking;
 }
 
-  export const useGetAllParkings = () => {
-    const { data, status } = useQuery({
-      queryKey: ["parkings"],
-      queryFn: getParkings,
-      select: mapParkings,
-    });
-  
-    const isLoading = status === 'loading';
-  
-    return { data, isLoading };
-  }
+export const useGetAllParkings = () => {
+  const { data, status } = useQuery({
+    queryKey: ["parkings"],
+    queryFn: getParkings,
+    select: mapParkings,
+  });
+
+  const isLoading = status === "loading";
+
+  return { data, isLoading };
+};
 
 function deleteParking(id: string) {
   return agent.Parkings.delete(id);
@@ -73,6 +73,7 @@ export const useGetParking = (id: string) => {
   return useQuery({
     queryKey: ["parking", id],
     queryFn: () => getParking(id),
+    keepPreviousData: false,
   });
 };
 
