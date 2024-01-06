@@ -11,6 +11,7 @@ import {
 import { useRef } from "react";
 import { FiEdit } from "react-icons/fi";
 import UpdateParkingForm from "./update-parking-form";
+import { useGetParking } from "@/lib/hooks/parkingHooks";
 
 type Props = {
   parkingId: number;
@@ -18,6 +19,10 @@ type Props = {
 
 function UpdateParkingModal({ parkingId }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const { data: parkingResponse } = useGetParking(
+    parkingId ? parkingId.toString() : ""
+  );
 
   const initialRef = useRef(null);
 
@@ -33,7 +38,15 @@ function UpdateParkingModal({ parkingId }: Props) {
           <ModalHeader>Edytuj parking</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <UpdateParkingForm parkingId={parkingId} onClose={onClose}/>
+            {parkingResponse ? (
+              <UpdateParkingForm
+                parkingId={parkingId}
+                parkingResponse={parkingResponse}
+                onClose={onClose}
+              />
+            ) : (
+              <div>Loading...</div>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

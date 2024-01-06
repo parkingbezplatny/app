@@ -25,14 +25,15 @@ body {
   height: 100%;
 }
 
-.maplibregl-ctrl-bottom-right{
+.maplibregl-ctrl-bottom-right {
   z-index: 0 !important;
 }
 
 ::-webkit-scrollbar {
   width: 0.2rem;
+  height: 0.2rem;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #DD6B20;
+  background: #dd6b20;
 }
