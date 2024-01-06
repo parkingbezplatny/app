@@ -81,17 +81,19 @@ export default function Profile() {
           >
             Zmień nazwę
           </Button>
-          <Button
-            bg="orange.500"
-            _hover={{
-              bg: "orange.600",
-            }}
-            textColor="white"
-            size="md"
-            onClick={passwordModal.onOpen}
-          >
-            Zmień hasło
-          </Button>
+          {!session?.user.isGoogle && (
+            <Button
+              bg="orange.500"
+              _hover={{
+                bg: "orange.600",
+              }}
+              textColor="white"
+              size="md"
+              onClick={passwordModal.onOpen}
+            >
+              Zmień hasło
+            </Button>
+          )}
         </Flex>
       </Box>
       <Box p={4}>
