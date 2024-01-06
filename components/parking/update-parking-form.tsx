@@ -1,3 +1,4 @@
+import { ApiResponse } from "@/lib/helpers/server-function-response";
 import { useGetParking, useUpdateParking } from "@/lib/hooks/parkingHooks";
 import { TParking, TUpdateParking } from "@/lib/types";
 import { UpdateParkingValidation } from "@/lib/validations/forms/updateParking.validation";
@@ -12,40 +13,18 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
   parkingId: number;
   onClose: () => void;
+  parkingResponse: ApiResponse<TParking | null> | undefined;
 };
 
-const mapParkingToUpdateParking = (parking: TParking): TUpdateParking => {
-  const { coordinates } = parking.geometry;
-  const { properties } = parking;
-  return {
-    geometry: {
-      lat: coordinates[0].toString(),
-      lng: coordinates[1].toString(),
-    },
-    properties: {
-      address: {
-        city: properties.address.city,
-        countryName: properties.address.countryName,
-        county: properties.address.county,
-        label: properties.address.label,
-        postalCode: properties.address.postalCode,
-        state: properties.address.state,
-        houseNumber: properties.address.houseNumber ?? undefined,
-        street: properties.address.street ?? undefined,
-      },
-    },
-  };
-};
-
-function UpdateParkingForm({ parkingId, onClose }: Props) {
-  const { data: parkingResponse } = useGetParking(parkingId ? parkingId.toString() : '');
-
+function UpdateParkingForm({ parkingId, onClose, parkingResponse }: Props) {
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -53,36 +32,35 @@ function UpdateParkingForm({ parkingId, onClose }: Props) {
   } = useForm<TUpdateParking>({
     resolver: zodResolver(UpdateParkingValidation),
     mode: "onChange",
-    // defaultValues: parkingDefaultValues,
     defaultValues: {
       ...parkingResponse?.data,
       geometry: {
-        lat: parkingResponse?.data?.geometry?.coordinates?.[0]?.toString() || '',
-        lng: parkingResponse?.data?.geometry?.coordinates?.[1]?.toString() || '',
+        lat:
+          parkingResponse?.data?.geometry?.coordinates?.[0]?.toString() || "",
+        lng:
+          parkingResponse?.data?.geometry?.coordinates?.[1]?.toString() || "",
       },
       properties: {
         address: {
           ...parkingResponse?.data?.properties?.address,
-          street: parkingResponse?.data?.properties?.address?.street || undefined,
-          houseNumber: parkingResponse?.data?.properties?.address?.houseNumber || undefined,
+          street:
+            parkingResponse?.data?.properties?.address?.street || undefined,
+          houseNumber:
+            parkingResponse?.data?.properties?.address?.houseNumber ||
+            undefined,
         },
       },
     },
   });
 
-  useEffect(() => {
-    if (parkingResponse?.data) {
-      //setParkingDefaultValues(mapParkingToUpdateParking(parkingResponse.data));
-    }
-  }, [parkingResponse]);
+  const { mutateAsync: updateParking } = useUpdateParking(onClose);
 
-  const { mutate: updateParking } = useUpdateParking(onClose);
-
-  const onSubmit = (data: TUpdateParking) => {
-    updateParking({
+  const onSubmit = async (data: TUpdateParking) => {
+    await updateParking({
       id: parkingId.toString(),
       updateParking: data,
     });
+    await queryClient.invalidateQueries(["parkings"]);
   };
 
   return (

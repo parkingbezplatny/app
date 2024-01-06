@@ -12,7 +12,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       <Navbar />
       <Box display="flex" minH="calc(100dvh - 83px)">
         <AdminSidePanel />
-        <Box flex="1" p={5}>
+        <Box overflowX="scroll" flex="1" p={5}>
           {children}
         </Box>
       </Box>

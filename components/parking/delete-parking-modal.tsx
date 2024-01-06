@@ -11,6 +11,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 
@@ -19,14 +20,16 @@ type Props = {
 };
 
 function DeleteParkingModal({ parkingId }: Props) {
+  const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const initialRef = useRef(null);
 
-  const { mutate: deleteParking } = useDeleteParking(onClose);
+  const { mutateAsync: deleteParking, status } = useDeleteParking(onClose);
 
-  function onDelete() {
-    deleteParking(parkingId.toString());
+  async function onDelete() {
+    await deleteParking(parkingId.toString());
+    await queryClient.invalidateQueries(["parkings"]);
   }
 
   return (
@@ -56,6 +59,7 @@ function DeleteParkingModal({ parkingId }: Props) {
                     bg: "orange.600",
                   }}
                   onClick={onDelete}
+                  isLoading={status === "loading"}
                 >
                   Tak
                 </Button>
