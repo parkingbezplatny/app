@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Divider,
+  Flex,
   HStack,
   Heading,
   List,
@@ -12,6 +13,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import Search from "./search";
+import { useFavorite } from "@/lib/hooks/useFavorite";
 
 const SidePanel = ({
   setSelectedPointOnMap,
@@ -20,14 +22,7 @@ const SidePanel = ({
 }) => {
   const [tab, setTab] = useState("favorites");
 
-  const { data: session } = useSession();
-  const favoriteParkingsIds =
-    session?.user.favoriteParkings?.map((parking) => parking.parkingId) ?? [];
-  const { data: parkingsQueryResult, isSuccess } =
-    useGetFavoriteParkings(favoriteParkingsIds);
-
-  const favoriteParkings =
-    parkingsQueryResult === undefined ? [] : parkingsQueryResult;
+  const favoriteParkings = useFavorite();
 
   return (
     <Box
@@ -80,17 +75,42 @@ const SidePanel = ({
             Ulubione
           </Heading>
           <Divider mb={2} borderColor="gray.200" />
-          {favoriteParkings.length > 0 ? (
-            <List mb={5}>
-              {favoriteParkings.map((parking) => (
-                <React.Fragment key={parking.id}>
-                  <Divider mb={2} borderColor="gray.200" />
-                </React.Fragment>
-              ))}
-            </List>
-          ) : (
-            <Text>Nie posiadasz jeszcze ulubionych parkingów.</Text>
-          )}
+          <Box
+            rounded="md"
+            border={
+              favoriteParkings?.data && favoriteParkings.data.length > 0
+                ? "1px solid #d8dce4"
+                : "none"
+            }
+            px={2}
+            maxH="50vh"
+            overflowY="auto"
+          >
+            {favoriteParkings?.data?.toReversed().map((favParking) => (
+              <Flex
+                key={favParking.id}
+                py="0.75rem"
+                borderBottom="1px"
+                borderColor="#d8dce4"
+                _last={{ borderBottom: "none" }}
+              >
+                <Box
+                  w="full"
+                  p="0.2rem"
+                  cursor="pointer"
+                  _hover={{ backgroundColor: "#dddddd" }}
+                  onClick={() => {
+                    setSelectedPointOnMap([
+                      favParking.parking.geometry.coordinates[0],
+                      favParking.parking.geometry.coordinates[1],
+                    ]);
+                  }}
+                >
+                  {favParking.parking.properties.address.label}
+                </Box>
+              </Flex>
+            ))}
+          </Box>
         </>
       )}
 

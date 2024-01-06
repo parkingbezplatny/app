@@ -3,6 +3,8 @@
 import Navbar from "@/components/navbar";
 import ChangePasswordModal from "@/components/user/change-password-modal";
 import ChangeUsernameModal from "@/components/user/change-username-modal";
+import { useFavorite } from "@/lib/hooks/useFavorite";
+import { useFavoriteMutation } from "@/lib/hooks/useFavoriteMutation";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import {
   Avatar,
@@ -16,22 +18,28 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 
 export default function Profile() {
   const { data: session } = useSession();
+  const [removingIds, setRemovingIds] = useState<number[]>([]);
 
   const columns = useBreakpointValue({ base: 1, md: 2, lg: 3 });
 
   const usernameModal = useDisclosure();
   const passwordModal = useDisclosure();
 
-  const favoriteParkingsIds =
-    session?.user.favoriteParkings?.map((parking) => parking.id) ?? [];
-  const { data: parkingsQueryResult } =
-    useGetFavoriteParkings(favoriteParkingsIds);
+  const favoriteParkings = useFavorite();
+  const { removeParkingFromFavorite } = useFavoriteMutation();
 
-  const parkings = parkingsQueryResult === undefined ? [] : parkingsQueryResult;
+  const handleRemoveParkingFromFavorite = (
+    parkingId: number,
+    favParkingId: number
+  ) => {
+    setRemovingIds((prev) => [...prev, favParkingId]);
+    removeParkingFromFavorite(parkingId.toString());
+  };
 
   return (
     <Box minH="100vh">
@@ -88,41 +96,35 @@ export default function Profile() {
       </Box>
       <Box p={4}>
         <SimpleGrid columns={columns} spacing={5}>
-          {parkings.map((parking, index) => (
-            <Box
-              key={index}
-              borderWidth={1}
-              borderRadius="lg"
-              overflow="hidden"
-              position="relative"
-            >
-              <IconButton
-                aria-label="Delete parking"
-                icon={<FaTrash />}
-                position="absolute"
-                top={"50%"}
-                transform="translateY(-50%)"
-                right={2}
-                bg="blackAlpha.200"
-                _hover={{
-                  bg: "red.400",
-                  color: "white",
-                }}
-                // onClick={() => handleDeleteParking(index)}
-              />
-              <Box p="6">
-                <Box display="flex" alignItems="baseline">
-                  <Box
-                    color="gray.500"
-                    fontWeight="semibold"
-                    letterSpacing="wide"
-                    fontSize="xs"
-                    textTransform="uppercase"
-                  >
-                    {parking.properties.address.label}
-                  </Box>
+          {favoriteParkings?.data?.toReversed().map((favParking) => (
+            <Box key={favParking.id} borderWidth={1} borderRadius="lg">
+              <Flex justify="space-between" align="center" p="6" gap="1rem">
+                <Box
+                  color="gray.500"
+                  fontWeight="semibold"
+                  letterSpacing="wide"
+                  fontSize="xs"
+                  textTransform="uppercase"
+                >
+                  {favParking.parking.properties.address.label}
                 </Box>
-              </Box>
+                <IconButton
+                  aria-label="Delete parking"
+                  icon={<FaTrash />}
+                  bg="blackAlpha.200"
+                  _hover={{
+                    bg: "red.400",
+                    color: "white",
+                  }}
+                  isDisabled={removingIds.includes(favParking.id)}
+                  onClick={() =>
+                    handleRemoveParkingFromFavorite(
+                      favParking.parkingId,
+                      favParking.id
+                    )
+                  }
+                />
+              </Flex>
             </Box>
           ))}
         </SimpleGrid>
