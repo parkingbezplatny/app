@@ -34,7 +34,7 @@ const Parkings = {
   create: (parking: TCreateParking) =>
     requests.post<ApiResponse<TParking | null>>("/parkings", parking),
   update: (id: string, parking: TUpdateParking) =>
-    requests.put<ApiResponse<TParking | null>>(`/parkings/${id}`, parking),
+    requests.patch<ApiResponse<TParking | null>>(`/parkings/${id}`, parking),
   delete: (id: string) => requests.delete<ApiResponse<null>>(`/parkings/${id}`),
 };
 
