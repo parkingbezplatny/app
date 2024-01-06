@@ -31,7 +31,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     mutationCache: new MutationCache({
       onError: (err: unknown) => {
         let message = "";
-        if (err !== null && typeof err === "object" && "message" in err) {
+        if (
+          err !== null &&
+          typeof err === "object" &&
+          "message" in err &&
+          "data" in err
+        ) {
           message = err.message as string;
         } else {
           if (err instanceof AxiosError) {
