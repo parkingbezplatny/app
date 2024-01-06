@@ -1,9 +1,11 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 export function useFavoriteMutation() {
+  const queryClient = useQueryClient();
+
   const removeParkingFromFavoriteMutation = useMutation({
     mutationKey: ["removeParkingFromFavoriteMutation"],
     mutationFn: async (parkingId: string) =>
@@ -18,10 +20,12 @@ export function useFavoriteMutation() {
 
   const addParkingToFavorite = async (parkingId: string) => {
     await addParkingFromFavoriteMutation.mutateAsync(parkingId);
+    await queryClient.invalidateQueries(["favoriteParkingsQuery"]);
   };
 
   const removeParkingFromFavorite = async (parkingId: string) => {
     await removeParkingFromFavoriteMutation.mutateAsync(parkingId);
+    await queryClient.invalidateQueries(["favoriteParkingsQuery"]);
   };
 
   return { addParkingToFavorite, removeParkingFromFavorite };
