@@ -1,3 +1,7 @@
+
+"use client";
+
+
 import maplibregl, {
   LngLatLike,
   MapGeoJSONFeature,
@@ -18,7 +22,8 @@ import { useFavoriteMutation } from "@/lib/hooks/useFavoriteMutation";
 import { useMapContext } from "@/lib/hooks/useMapContext";
 
 export default function Map() {
-  const { selectedPointOnMap } = useMapContext();
+  const { selectedPointOnMap, mapNode } = useMapContext();
+
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
   const [zoom] = useState(5);
@@ -104,6 +109,7 @@ export default function Map() {
   }, [popupUpdate]);
 
   useEffect(() => {
+    // if (mapNode) return;
     if (status !== "success") return;
 
     if (map.current) return;
@@ -215,7 +221,7 @@ export default function Map() {
         handlePopup(e);
       });
     });
-  }, [API_KEY, zoom, parkingsForMapQueryResult, status]);
+  }, [API_KEY, zoom, parkingsForMapQueryResult, status, mapNode]);
 
   useEffect(() => {
     if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
@@ -228,32 +234,31 @@ export default function Map() {
 
   return (
     <div className="map-wrap">
-      <div ref={mapContainer} className="map">
-        {status === "loading" && (
-          <Flex
-            justifyContent="center"
-            alignItems="center"
-            height="80dvh"
-            direction="column"
+      {status === "loading" && (
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          height="80dvh"
+          direction="column"
+        >
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            size="xl"
+            color="orange.500"
+          />
+          <Text
+            textAlign="center"
+            fontWeight="light"
+            fontSize={["md", "md", "xl"]}
+            mt={4}
           >
-            <Spinner
-              thickness="4px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              size="xl"
-              color="orange.500"
-            />
-            <Text
-              textAlign="center"
-              fontWeight="light"
-              fontSize={["md", "md", "xl"]}
-              mt={4}
-            >
-              Przygotowywanie mapy parkingów...
-            </Text>
-          </Flex>
-        )}
-      </div>
+            Przygotowywanie mapy parkingów...
+          </Text>
+        </Flex>
+      )}
+      <div ref={mapContainer} className="map"></div>
     </div>
   );
 }
