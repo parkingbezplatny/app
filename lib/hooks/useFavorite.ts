@@ -40,5 +40,5 @@ export function useFavorite() {
     favoriteParkingsQuery.refetch();
   }, [session]);
 
-  return favoriteParkingsQuery.data;
+  return favoriteParkingsQuery;
 }
