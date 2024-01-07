@@ -30,7 +30,7 @@ export default function Profile() {
   const usernameModal = useDisclosure();
   const passwordModal = useDisclosure();
 
-  const favoriteParkings = useFavorite();
+  const { data: favoriteParkings } = useFavorite();
   const { removeParkingFromFavorite } = useFavoriteMutation();
 
   const handleRemoveParkingFromFavorite = (
