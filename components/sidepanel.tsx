@@ -7,6 +7,7 @@ import {
   HStack,
   Heading,
   List,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction, useState } from "react";
@@ -14,15 +15,13 @@ import { useSession } from "next-auth/react";
 import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
 import Search from "./search";
 import { useFavorite } from "@/lib/hooks/useFavorite";
+import { useMapContext } from "@/lib/hooks/useMapContext";
 
-const SidePanel = ({
-  setSelectedPointOnMap,
-}: {
-  setSelectedPointOnMap: Dispatch<SetStateAction<number[]>>;
-}) => {
+const SidePanel = () => {
   const [tab, setTab] = useState("favorites");
+  const { handleSetSelectedPointOnMap } = useMapContext();
 
-  const favoriteParkings = useFavorite();
+  const { data: favoriteParkings, status } = useFavorite();
 
   return (
     <Box
@@ -75,48 +74,52 @@ const SidePanel = ({
             Ulubione
           </Heading>
           <Divider mb={2} borderColor="gray.200" />
-          <Box
-            rounded="md"
-            border={
-              favoriteParkings?.data && favoriteParkings.data.length > 0
-                ? "1px solid #d8dce4"
-                : "none"
-            }
-            px={2}
-            maxH="50vh"
-            overflowY="auto"
-          >
-            {favoriteParkings?.data?.toReversed().map((favParking) => (
-              <Flex
-                key={favParking.id}
-                py="0.75rem"
-                borderBottom="1px"
-                borderColor="#d8dce4"
-                _last={{ borderBottom: "none" }}
-              >
-                <Box
-                  w="full"
-                  p="0.2rem"
-                  cursor="pointer"
-                  _hover={{ backgroundColor: "#dddddd" }}
-                  onClick={() => {
-                    setSelectedPointOnMap([
-                      favParking.parking.geometry.coordinates[0],
-                      favParking.parking.geometry.coordinates[1],
-                    ]);
-                  }}
+          {status === "loading" ? (
+            <Flex justify="center" align="center">
+              <Spinner />
+            </Flex>
+          ) : (
+            <Box
+              rounded="md"
+              border={
+                favoriteParkings?.data && favoriteParkings.data.length > 0
+                  ? "1px solid #d8dce4"
+                  : "none"
+              }
+              px={2}
+              maxH="50vh"
+              overflowY="auto"
+            >
+              {favoriteParkings?.data?.toReversed().map((favParking) => (
+                <Flex
+                  key={favParking.id}
+                  py="0.75rem"
+                  borderBottom="1px"
+                  borderColor="#d8dce4"
+                  _last={{ borderBottom: "none" }}
                 >
-                  {favParking.parking.properties.address.label}
-                </Box>
-              </Flex>
-            ))}
-          </Box>
+                  <Box
+                    w="full"
+                    p="0.2rem"
+                    cursor="pointer"
+                    _hover={{ backgroundColor: "#dddddd" }}
+                    onClick={() => {
+                      handleSetSelectedPointOnMap([
+                        favParking.parking.geometry.coordinates[0],
+                        favParking.parking.geometry.coordinates[1],
+                      ]);
+                    }}
+                  >
+                    {favParking.parking.properties.address.label}
+                  </Box>
+                </Flex>
+              ))}
+            </Box>
+          )}
         </>
       )}
 
-      {tab === "search" && (
-        <Search setSelectedPointOnMap={setSelectedPointOnMap} />
-      )}
+      {tab === "search" && <Search />}
     </Box>
   );
 };
