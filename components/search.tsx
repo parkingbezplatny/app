@@ -1,16 +1,14 @@
 "use client";
 
 import useDebounce from "@/lib/hooks/useDebounce";
+import { useMapContext } from "@/lib/hooks/useMapContext";
 import { TParking } from "@/lib/types";
 import { Box, Flex, Heading, Input, Spinner, Text } from "@chakra-ui/react";
 import axios from "axios";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-function Search({
-  setSelectedPointOnMap,
-}: {
-  setSelectedPointOnMap: Dispatch<SetStateAction<number[]>>;
-}) {
+function Search() {
+  const { handleSetSelectedPointOnMap } = useMapContext();
   const [inputValue, setInputValue] = useState<string>("");
   const [searchParkings, setSearchParkings] = useState<TParking[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,7 +61,9 @@ function Search({
             <Spinner />
           </Flex>
         ) : error ? (
-          <Text mt={-1} textAlign="center">{error}</Text>
+          <Text mt={-1} textAlign="center">
+            {error}
+          </Text>
         ) : (
           <Box
             rounded="md"
@@ -86,7 +86,7 @@ function Search({
                   cursor="pointer"
                   _hover={{ backgroundColor: "#dddddd" }}
                   onClick={() => {
-                    setSelectedPointOnMap([
+                    handleSetSelectedPointOnMap([
                       parking.geometry.coordinates[0],
                       parking.geometry.coordinates[1],
                     ]);

@@ -11,6 +11,7 @@ import { SessionProvider } from "next-auth/react";
 import { getErrorMessage } from "../helpers/getErrorMessage";
 import { ApiResponse } from "../helpers/server-function-response";
 import { AxiosError, AxiosResponse } from "axios";
+import { MapContextProvider } from "../context/mapContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const toast = useToast();
@@ -72,7 +73,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <ChakraProvider>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <MapContextProvider>{children}</MapContextProvider>
         </QueryClientProvider>
       </ChakraProvider>
     </SessionProvider>

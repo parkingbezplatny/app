@@ -1,18 +1,26 @@
 "use client";
 
 import Map from "@/components/map";
+import { useMapContext } from "@/lib/hooks/useMapContext";
 import { Box, IconButton, Slide, useBreakpointValue } from "@chakra-ui/react";
 import Navbar from "components/navbar";
 import SidePanel from "components/sidepanel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 function Dashboard() {
+  const { handleSetMapNode, mapNode } = useMapContext();
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
   const [selectedPointOnMap, setSelectedPointOnMap] = useState<number[]>([
     19.0, 51.5,
   ]);
+
+  useEffect(() => {
+    if (!mapNode) {
+      handleSetMapNode(<Map />);
+    }
+  }, [mapNode]);
 
   return (
     <>
@@ -29,7 +37,7 @@ function Dashboard() {
             direction="left"
             in={true}
           >
-            <SidePanel setSelectedPointOnMap={setSelectedPointOnMap} />
+            <SidePanel />
           </Slide>
         ) : null}
         {!isLargerThanLG && (
@@ -48,7 +56,8 @@ function Dashboard() {
           />
         )}
         <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
-          <Map selectedPointOnMap={selectedPointOnMap} />
+          {mapNode}
+          {/* <Map selectedPointOnMap={selectedPointOnMap} /> */}
         </Box>
       </Box>
     </>

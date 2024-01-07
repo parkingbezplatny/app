@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/nextauth/authOptions";
 import {
   addToFavoriteParkingById,
   removeFromFavoriteParkingById,
-} from "@/lib/services/parking";
+} from "@/lib/services/favorite";
 import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 

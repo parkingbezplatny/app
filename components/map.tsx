@@ -1,4 +1,3 @@
-
 import maplibregl, {
   LngLatLike,
   MapGeoJSONFeature,
@@ -16,13 +15,10 @@ import { Spinner, Flex, Text } from "@chakra-ui/react";
 
 import { useSession } from "next-auth/react";
 import { useFavoriteMutation } from "@/lib/hooks/useFavoriteMutation";
+import { useMapContext } from "@/lib/hooks/useMapContext";
 
-
-export default function Map({
-  selectedPointOnMap,
-}: {
-  selectedPointOnMap: number[];
-}) {
+export default function Map() {
+  const { selectedPointOnMap } = useMapContext();
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
   const [zoom] = useState(5);
@@ -139,7 +135,6 @@ export default function Map({
           })
         );
 
-
         map.current.addSource("places", {
           type: "geojson",
           data: {
@@ -205,7 +200,6 @@ export default function Map({
           },
         });
       });
-
 
       map.current.on("mouseenter", "places", () => {
         if (!map.current) return;
