@@ -494,33 +494,40 @@ export async function updateUserPasswordById(
 }
 
 // TODO change admin role
-// export async function updateUserAdminByEmail(
-//   email: string,
-//   isAdmin: boolean
-// ): Promise<TUserDatabase> {
-//   try {
-//     const user = await getUserByEmail(email);
-//     if (!user) throw new Error("Nie znaleziono użytkownika");
+export async function updateUserAdminById(
+  id: string,
+  isAdmin: boolean
+): Promise<ServerFunctionResponse<TUser | null>> {
+  try {
+    const updatedUser = await prisma.user.update({
+      data: {
+        isAdmin: isAdmin,
+      },
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        favoriteParkings: true,
+        parkingRatings: true,
+      },
+    });
 
-//     await prisma.user.update({
-//       data: {
-//         isAdmin: isAdmin,
-//       },
-//       where: {
-//         email: email,
-//       },
-//     });
+    if (isAdmin)
+      return new SuccessServerFunctionResponse(
+        "Użytkownik jest administratorem.",
+        updatedUser
+      );
 
-//     const updateUser = await getUserByEmail(email);
-//     if (!updateUser) throw new Error("Błąd aktualizacji danych użytkownika");
-
-//     return updateUser;
-//   } catch (err: unknown) {
-//     throw getErrorMessage(err);
-//   } finally {
-//     await prisma.$disconnect();
-//   }
-// }
+    return new SuccessServerFunctionResponse(
+      "Użytkownik nie jest administratorem.",
+      updatedUser
+    );
+  } catch (err: unknown) {
+    return new ExceptionServerFunctionResponse(getErrorMessage(err));
+  } finally {
+    await prisma.$disconnect();
+  }
+}
 
 // export async function updateUserAdminById(
 //   id: string,

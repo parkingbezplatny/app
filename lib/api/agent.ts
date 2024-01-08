@@ -11,8 +11,6 @@ import {
 } from "@/lib/types";
 import axios, { AxiosResponse } from "axios";
 
-axios.defaults.baseURL = "/api";
-
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
@@ -26,16 +24,22 @@ const requests = {
 };
 
 const Parkings = {
-  list: () => requests.get<ApiResponse<TParking[] | null>>("/parkings"),
+  list: () => requests.get<ApiResponse<TParking[] | null>>("/api/parkings"),
   listForMap: () =>
-    requests.get<ApiResponse<TParkingMap[] | null>>("/parkings?formatting=map"),
+    requests.get<ApiResponse<TParkingMap[] | null>>(
+      "/api/parkings?formatting=map"
+    ),
   details: (id: string) =>
-    requests.get<ApiResponse<TParking | null>>(`/parkings/${id}`),
+    requests.get<ApiResponse<TParking | null>>(`/api/parkings/${id}`),
   create: (parking: TCreateParking) =>
-    requests.post<ApiResponse<TParking | null>>("/parkings", parking),
+    requests.post<ApiResponse<TParking | null>>("/api/parkings", parking),
   update: (id: string, parking: TUpdateParking) =>
-    requests.patch<ApiResponse<TParking | null>>(`/parkings/${id}`, parking),
-  delete: (id: string) => requests.delete<ApiResponse<null>>(`/parkings/${id}`),
+    requests.patch<ApiResponse<TParking | null>>(
+      `/api/parkings/${id}`,
+      parking
+    ),
+  delete: (id: string) =>
+    requests.delete<ApiResponse<null>>(`/api/parkings/${id}`),
 };
 
 const Users = {
@@ -44,7 +48,7 @@ const Users = {
     updateUserUsername: TUpdateUserUsername
   ) =>
     requests.patch<ApiResponse<TUser | null>>(
-      `/users/by-email?email=${email}`,
+      `/api/users/by-email?email=${email}`,
       updateUserUsername
     ),
   updatePasswordByEmail: (
@@ -52,14 +56,14 @@ const Users = {
     updateUserPassword: TUpdateUserPassword
   ) =>
     requests.patch<ApiResponse<TUser | null>>(
-      `/users/password-reset/by-email?email=${email}`,
+      `/api/users/password-reset/by-email?email=${email}`,
       updateUserPassword
     ),
 };
 
 const Auth = {
   signUpWithCredentials: (sigupFrom: TSignUpForm) =>
-    axios.post<ApiResponse<TUser | null>>(`/account`, sigupFrom),
+    axios.post<ApiResponse<TUser | null>>(`/api/account`, sigupFrom),
 };
 
 const agent = {

@@ -204,6 +204,20 @@ export default function Map() {
         });
       });
 
+      map.current.on("click", "clusters", function (e) {
+        if (!map.current) return;
+        var view = map.current.queryRenderedFeatures(e.point, {
+          layers: ["clusters"],
+        });
+        var clusterId = view[0].properties.cluster_id;
+        if ("coordinates" in view[0].geometry) {
+          map.current.easeTo({
+            center: view[0].geometry.coordinates as LngLatLike,
+            zoom: map.current.getZoom() + 1,
+          });
+        }
+      });
+
       map.current.on("mouseenter", "places", () => {
         if (!map.current) return;
         map.current.getCanvas().style.cursor = "pointer";
@@ -224,8 +238,11 @@ export default function Map() {
     if (selectedPointOnMap[0] === 19.0 && selectedPointOnMap[1] === 51.5)
       return;
     if (map.current) {
-      map.current.setCenter(selectedPointOnMap as LngLatLike);
-      map.current.setZoom(14);
+      map.current.easeTo({
+        center: selectedPointOnMap as LngLatLike,
+        zoom: 14,
+        duration: 3000,
+      });
     }
   }, [selectedPointOnMap]);
 

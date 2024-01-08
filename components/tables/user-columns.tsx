@@ -37,7 +37,6 @@ export const userColumns: ColumnDef<
       return (
         <Flex direction="row" gap="1rem" justify="flex-end">
           <SetUserAdminModal userId={user.id} />
-          <DeleteUserModal userId={user.id} />
         </Flex>
       );
     },

@@ -24,7 +24,7 @@ function Search() {
       return;
     }
     await axios
-      .get(`/parkings?city=${debouncedInputValue}`)
+      .get(`/api/parkings?city=${debouncedInputValue}`)
       .then((res) => {
         setSearchParkings(res.data.data);
       })
@@ -68,23 +68,25 @@ function Search() {
           <Box
             rounded="md"
             border={searchParkings.length > 0 ? "1px solid #d8dce4" : "none"}
-            px={2}
             maxH="65dvh"
             overflowY="auto"
           >
             {searchParkings.map((parking) => (
               <Flex
                 key={parking.id}
-                py="0.75rem"
                 borderBottom="1px"
                 borderColor="#d8dce4"
                 _last={{ borderBottom: "none" }}
               >
                 <Box
                   w="full"
-                  p="0.2rem"
+                  p="0.75rem"
+                  rounded="md"
                   cursor="pointer"
-                  _hover={{ backgroundColor: "#dddddd" }}
+                  _hover={{ backgroundColor: "#eeeeee" }}
+                  transition="all"
+                  transitionTimingFunction="ease-in-out"
+                  transitionDuration="0.2s"
                   onClick={() => {
                     handleSetSelectedPointOnMap([
                       parking.geometry.coordinates[0],

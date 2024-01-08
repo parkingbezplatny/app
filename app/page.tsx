@@ -1,8 +1,18 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Heading, Text, Button, Flex, Image } from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 function WelcomePage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) router.push("/dashboard");
+  }, [session]);
   return (
     <>
       <Box
