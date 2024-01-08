@@ -43,7 +43,7 @@ function Dashboard() {
             display={{ base: "inherit", lg: "none" }}
             position="absolute"
             top={114}
-            left={isPanelVisible ? "240px" : { base: "5px", md: "8px" }}
+            left={isPanelVisible ? "240px" : { base: 5, md: 8 }}
             rounded={"full"}
             bg={"white"}
             boxShadow={"0 0 0 2px rgba(0,0,0,.1)"}
