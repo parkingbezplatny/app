@@ -1,6 +1,4 @@
-
 "use client";
-
 
 import maplibregl, {
   LngLatLike,
@@ -109,7 +107,6 @@ export default function Map() {
   }, [popupUpdate]);
 
   useEffect(() => {
-    // if (mapNode) return;
     if (status !== "success") return;
 
     if (map.current) return;
@@ -234,31 +231,33 @@ export default function Map() {
 
   return (
     <div className="map-wrap">
-      {status === "loading" && (
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          height="80dvh"
-          direction="column"
-        >
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            size="xl"
-            color="orange.500"
-          />
-          <Text
-            textAlign="center"
-            fontWeight="light"
-            fontSize={["md", "md", "xl"]}
-            mt={4}
+      <div ref={mapContainer} className="map">
+        {" "}
+        {status === "loading" && (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            height="80dvh"
+            direction="column"
           >
-            Przygotowywanie mapy parkingów...
-          </Text>
-        </Flex>
-      )}
-      <div ref={mapContainer} className="map"></div>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              size="xl"
+              color="orange.500"
+            />
+            <Text
+              textAlign="center"
+              fontWeight="light"
+              fontSize={["md", "md", "xl"]}
+              mt={4}
+            >
+              Przygotowywanie mapy parkingów...
+            </Text>
+          </Flex>
+        )}
+      </div>
     </div>
   );
 }

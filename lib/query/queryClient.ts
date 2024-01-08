@@ -1,17 +1,21 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import { ApiResponse } from "../helpers/server-function-response";
+import { createStandaloneToast } from "@chakra-ui/react";
+import { getErrorMessage } from "../helpers/getErrorMessage";
+
+const { toast } = createStandaloneToast();
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (err: unknown) => {
       if (err instanceof AxiosError) {
         const data = err.response?.data as ApiResponse<unknown>;
-        //   toast({
-        //     title: getErrorMessage(data.message),
-        //     status: "error",
-        //     isClosable: true,
-        //   });
+        toast({
+          title: getErrorMessage(data.message),
+          status: "error",
+          isClosable: true,
+        });
       }
     },
   }),
@@ -31,11 +35,11 @@ export const queryClient = new QueryClient({
           message = data.message;
         }
       }
-      // toast({
-      //   title: getErrorMessage(message),
-      //   status: "error",
-      //   isClosable: true,
-      // });
+      toast({
+        title: getErrorMessage(message),
+        status: "error",
+        isClosable: true,
+      });
     },
     onSuccess: (data: unknown) => {
       let message = "";
@@ -46,11 +50,11 @@ export const queryClient = new QueryClient({
         const dataFromResponse = dataResponse.data as ApiResponse<unknown>;
         message = dataFromResponse.message;
       }
-      // toast({
-      //   title: getErrorMessage(message),
-      //   status: "success",
-      //   isClosable: true,
-      // });
+      toast({
+        title: getErrorMessage(message),
+        status: "success",
+        isClosable: true,
+      });
     },
   }),
 });
