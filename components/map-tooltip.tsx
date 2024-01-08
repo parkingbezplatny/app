@@ -30,7 +30,7 @@ function MapTooltip({
   parkingCoordinates,
   removeParkingFromFavorite,
   addParkingToFavorite,
-  session, // handleSetPopupUpdate,
+  session,
 }: MapTooltipProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,12 +42,10 @@ function MapTooltip({
     ) {
       setIsLoading(true);
       removeParkingFromFavorite(parkingId!);
-      // handleSetPopupUpdate();
       return;
     }
     setIsLoading(true);
     addParkingToFavorite(parkingId!);
-    // handleSetPopupUpdate();
   };
 
 

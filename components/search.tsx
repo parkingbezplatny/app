@@ -5,7 +5,7 @@ import { useMapContext } from "@/lib/hooks/useMapContext";
 import { TParking } from "@/lib/types";
 import { Box, Flex, Heading, Input, Spinner, Text } from "@chakra-ui/react";
 import axios from "axios";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Search() {
   const { handleSetSelectedPointOnMap } = useMapContext();
@@ -69,7 +69,7 @@ function Search() {
             rounded="md"
             border={searchParkings.length > 0 ? "1px solid #d8dce4" : "none"}
             px={2}
-            maxH="50vh"
+            maxH="65dvh"
             overflowY="auto"
           >
             {searchParkings.map((parking) => (
