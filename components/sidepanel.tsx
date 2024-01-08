@@ -71,11 +71,11 @@ const SidePanel = () => {
           </Heading>
           <Divider mb={2} borderColor="gray.200" />
           {status === "loading" ? (
-            <Flex mt={1} justify="center" align="center">
+            <Flex mt={2} justify="center" align="center">
               <Spinner />
             </Flex>
           ) : favoriteParkings?.data?.length === 0 ? (
-              <Text mt={1} textAlign="center">Nie posiadasz jeszcze ulubionych parkingów</Text>
+              <Text mt={2} textAlign="center">Nie posiadasz jeszcze ulubionych parkingów</Text>
           ) : (
             <Box rounded="md" px={2} maxH="100dvh" overflowY="auto">
               {favoriteParkings?.data?.toReversed().map((favParking) => (

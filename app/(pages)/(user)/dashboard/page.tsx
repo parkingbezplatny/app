@@ -11,8 +11,8 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 function Dashboard() {
   const { handleSetMapNode, mapNode } = useMapContext();
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
+  const isLargerThanMD = useBreakpointValue({ base: false, md: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
-  const leftAbsolutePosition = useBreakpointValue({ base: "5", md: isPanelVisible ? "240px" : "8" });
 
   useEffect(() => {
     if (!mapNode) {
@@ -44,7 +44,7 @@ function Dashboard() {
             display={{ base: "inherit", lg: "none" }}
             position="absolute"
             top={114}
-            left={leftAbsolutePosition}
+            left={isPanelVisible ? (isLargerThanMD ? "240px" : "5") : "8"}
             rounded={"full"}
             bg={"white"}
             boxShadow={"0 0 0 2px rgba(0,0,0,.1)"}
