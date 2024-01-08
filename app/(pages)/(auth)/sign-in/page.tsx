@@ -26,8 +26,6 @@ import { useForm } from "react-hook-form";
 import { FaGoogle } from "react-icons/fa";
 
 function SignIn() {
-  const router = useRouter();
-  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 

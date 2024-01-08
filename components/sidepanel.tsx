@@ -75,22 +75,32 @@ const SidePanel = () => {
               <Spinner />
             </Flex>
           ) : favoriteParkings?.data?.length === 0 ? (
-              <Text mt={2} textAlign="center">Nie posiadasz jeszcze ulubionych parkingów</Text>
+            <Text mt={2} textAlign="center">
+              Nie posiadasz jeszcze ulubionych parkingów
+            </Text>
           ) : (
-            <Box rounded="md" px={2} maxH="100dvh" overflowY="auto">
+            <Box
+              rounded="md"
+              border="1px solid #d8dce4"
+              maxH="65dvh"
+              overflowY="auto"
+            >
               {favoriteParkings?.data?.toReversed().map((favParking) => (
                 <Flex
                   key={favParking.id}
-                  py="0.75rem"
                   borderBottom="1px"
                   borderColor="#d8dce4"
                   _last={{ borderBottom: "none" }}
                 >
                   <Box
                     w="full"
-                    p="0.2rem"
+                    p="0.75rem"
+                    rounded="md"
                     cursor="pointer"
-                    _hover={{ backgroundColor: "#dddddd" }}
+                    _hover={{ backgroundColor: "#eeeeee" }}
+                    transition="all"
+                    transitionTimingFunction="ease-in-out"
+                    transitionDuration="0.2s"
                     onClick={() => {
                       handleSetSelectedPointOnMap([
                         favParking.parking.geometry.coordinates[0],

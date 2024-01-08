@@ -9,13 +9,13 @@ export function useFavoriteMutation() {
   const removeParkingFromFavoriteMutation = useMutation({
     mutationKey: ["removeParkingFromFavoriteMutation"],
     mutationFn: async (parkingId: string) =>
-      await axios.delete(`/favorite/${parkingId}`),
+      await axios.delete(`/api/favorite/${parkingId}`),
   });
 
   const addParkingFromFavoriteMutation = useMutation({
     mutationKey: ["addParkingFromFavoriteMutation"],
     mutationFn: async (parkingId: string) =>
-      await axios.post(`/favorite/${parkingId}`),
+      await axios.post(`/api/favorite/${parkingId}`),
   });
 
   const addParkingToFavorite = async (parkingId: string) => {

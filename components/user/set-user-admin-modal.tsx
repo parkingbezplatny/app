@@ -1,3 +1,7 @@
+"use client";
+
+import useAdminFunctions from "@/lib/hooks/useAdminFunctions";
+import { TUser } from "@/lib/types";
 import {
   Button,
   Flex,
@@ -9,28 +13,89 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Select,
-  Text,
+  Switch,
   useDisclosure,
 } from "@chakra-ui/react";
-import { ChangeEvent, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 
 type Props = {
   userId: number;
 };
 
+type SwitchFormProps = {
+  updateAdmin: (isAdmin: boolean) => Promise<void>;
+  user: TUser;
+  isLoading: boolean;
+  onClose: () => void;
+};
+
+function SwitchForm({
+  user,
+  updateAdmin,
+  isLoading,
+  onClose,
+}: SwitchFormProps) {
+  const [isAdmin, setIsAdmin] = useState<boolean>(user.isAdmin);
+
+  return (
+    <Flex direction="column" gap="1rem">
+      <Flex direction="column" justify="space-between" gap="1rem">
+        <FormControl>
+          <FormLabel>Administrator</FormLabel>
+          <Switch
+            colorScheme="orange"
+            defaultChecked={isAdmin}
+            onChange={(e) => {
+              setIsAdmin(e.target.checked);
+            }}
+          />
+        </FormControl>
+        <Flex direction="row" justify="space-between">
+          <Button onClick={onClose} w="100px" size="md" variant="ghost">
+            Anuluj
+          </Button>
+          <Button
+            textColor="white"
+            w="100px"
+            size="md"
+            bg="orange.500"
+            _hover={{
+              bg: "orange.600",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              updateAdmin(isAdmin);
+            }}
+            isLoading={isLoading}
+          >
+            Zapisz
+          </Button>
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+}
+
 function SetUserAdminModal({ userId }: Props) {
-  const [isAdmin, setIsAdmin] = useState<string>("false");
+  const queryClient = useQueryClient();
+  const { getUserById, updateUserById } = useAdminFunctions();
+  const { data: user, status } = getUserById(userId.toString() ?? "");
+  const { mutateAsync, isLoading } = updateUserById();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const initialRef = useRef(null);
 
-  const updateAdmin = async () => {
-    //TODO call to API for delete
-    alert(isAdmin);
+  const updateAdmin = async (isAdmin: boolean) => {
+    if (isAdmin === user?.data.isAdmin || isAdmin === undefined) return;
+    await mutateAsync({ isAdmin: isAdmin, userId: userId.toString() });
+    await queryClient.invalidateQueries(["getAllUsersAdmin"]);
+    await queryClient.invalidateQueries(["getUserAdmin", userId.toString()]);
     onClose();
   };
+
   return (
     <>
       <Button variant="ghost" onClick={onOpen}>
@@ -43,40 +108,16 @@ function SetUserAdminModal({ userId }: Props) {
           <ModalHeader>Zrób administratora</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <Flex direction="column" gap="1rem">
-              <Flex direction="column" justify="space-between" gap="1rem">
-                <FormControl>
-                  <FormLabel>Administrator</FormLabel>
-                  <Select
-                    focusBorderColor="orange.400"
-                    defaultValue={isAdmin}
-                    onChange={(e) => {
-                      setIsAdmin(e.target.value);
-                    }}
-                  >
-                    <option value="true">Tak</option>
-                    <option value="false">Nie</option>
-                  </Select>
-                </FormControl>
-                <Flex direction="row" justify="space-between">
-                  <Button onClick={onClose} w="100px" size="md" variant="ghost">
-                    Anuluj
-                  </Button>
-                  <Button
-                    textColor="white"
-                    w="100px"
-                    size="md"
-                    bg="orange.500"
-                    _hover={{
-                      bg: "orange.600",
-                    }}
-                    onClick={updateAdmin}
-                  >
-                    Zapisz
-                  </Button>
-                </Flex>
-              </Flex>
-            </Flex>
+            {status === "loading" || !user?.data ? (
+              <div>Loading...</div>
+            ) : (
+              <SwitchForm
+                user={user.data}
+                updateAdmin={updateAdmin}
+                isLoading={isLoading}
+                onClose={onClose}
+              />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

@@ -29,7 +29,7 @@ export function useFavorite() {
   const favoriteParkingsQuery = useQuery({
     queryFn: async () =>
       await axios
-        .get<ApiResponse<TFavorite[]>>("/favorite")
+        .get<ApiResponse<TFavorite[]>>("/api/favorite")
         .then((res) => res.data),
     queryKey: ["favoriteParkingsQuery"],
     enabled: session ? true : false,
