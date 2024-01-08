@@ -1,6 +1,9 @@
 "use client";
 
-import useAdminFunctions from "@/lib/hooks/useAdminFunctions";
+import useAdminFunctions, {
+  useGetUserById,
+  useUpdateUserById,
+} from "@/lib/hooks/useAdminFunctions";
 import { TUser } from "@/lib/types";
 import {
   Button,
@@ -80,9 +83,8 @@ function SwitchForm({
 
 function SetUserAdminModal({ userId }: Props) {
   const queryClient = useQueryClient();
-  const { getUserById, updateUserById } = useAdminFunctions();
-  const { data: user, status } = getUserById(userId.toString() ?? "");
-  const { mutateAsync, isLoading } = updateUserById();
+  const { data: user, status } = useGetUserById(userId.toString() ?? "");
+  const { mutateAsync, isLoading } = useUpdateUserById();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 

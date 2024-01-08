@@ -206,13 +206,13 @@ export default function Map() {
 
       map.current.on("click", "clusters", function (e) {
         if (!map.current) return;
-        var features = map.current.queryRenderedFeatures(e.point, {
+        var view = map.current.queryRenderedFeatures(e.point, {
           layers: ["clusters"],
         });
-        var clusterId = features[0].properties.cluster_id;
-        if ("coordinates" in features[0].geometry) {
+        var clusterId = view[0].properties.cluster_id;
+        if ("coordinates" in view[0].geometry) {
           map.current.easeTo({
-            center: features[0].geometry.coordinates as LngLatLike,
+            center: view[0].geometry.coordinates as LngLatLike,
             zoom: map.current.getZoom() + 1,
           });
         }
