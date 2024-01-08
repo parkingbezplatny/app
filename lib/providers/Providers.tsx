@@ -1,27 +1,22 @@
 "use client";
 
-import { ChakraProvider, useToast } from "@chakra-ui/react";
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { ChakraProvider, createStandaloneToast } from "@chakra-ui/react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
-import { getErrorMessage } from "../helpers/getErrorMessage";
-import { ApiResponse } from "../helpers/server-function-response";
-import { AxiosError, AxiosResponse } from "axios";
 import { MapContextProvider } from "../context/mapContext";
 import { queryClient } from "../query/queryClient";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
-  // const toast = useToast();
+const { ToastContainer, toast } = createStandaloneToast();
 
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <ChakraProvider>
         <QueryClientProvider client={queryClient}>
-          <MapContextProvider>{children}</MapContextProvider>
+          <MapContextProvider>
+            {children}
+            <ToastContainer />
+          </MapContextProvider>
         </QueryClientProvider>
       </ChakraProvider>
     </SessionProvider>
