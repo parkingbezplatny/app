@@ -12,6 +12,7 @@ function Dashboard() {
   const { handleSetMapNode, mapNode } = useMapContext();
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
+  const leftAbsolutePosition = useBreakpointValue({ base: "5", md: isPanelVisible ? "240px" : "8" });
 
   useEffect(() => {
     if (!mapNode) {
@@ -43,7 +44,7 @@ function Dashboard() {
             display={{ base: "inherit", lg: "none" }}
             position="absolute"
             top={114}
-            left={isPanelVisible ? "240px" : "8"}
+            left={leftAbsolutePosition}
             rounded={"full"}
             bg={"white"}
             boxShadow={"0 0 0 2px rgba(0,0,0,.1)"}

@@ -6,7 +6,6 @@ import {
   Flex,
   HStack,
   Heading,
-  List,
   Spinner,
   Text,
 } from "@chakra-ui/react";

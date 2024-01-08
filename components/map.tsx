@@ -13,7 +13,7 @@ import { createRoot } from "react-dom/client";
 
 import { useGetParkingsForMap } from "@/lib/hooks/parkingHooks";
 import MapTooltip from "./map-tooltip";
-import { Spinner, Flex, Text } from "@chakra-ui/react";
+import { Spinner, Flex, Text, Box } from "@chakra-ui/react";
 
 import { useSession } from "next-auth/react";
 import { useFavoriteMutation } from "@/lib/hooks/useFavoriteMutation";
@@ -230,7 +230,15 @@ export default function Map() {
   }, [selectedPointOnMap]);
 
   return (
-    <div className="map-wrap">
+    <Box
+      flex="1"
+      p={{ base: 2, md: 5 }}
+      ml={{ base: 0, lg: "25%" }}
+      height={{
+        base: "calc(100vh - 1.5rem)",
+        md: "calc(100vh - 83px - 2.5rem)",
+      }}
+    >
       <div ref={mapContainer} className="map">
         {" "}
         {status === "loading" && (
@@ -258,6 +266,6 @@ export default function Map() {
           </Flex>
         )}
       </div>
-    </div>
+    </Box>
   );
 }
