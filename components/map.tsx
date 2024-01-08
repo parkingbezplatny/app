@@ -1,4 +1,6 @@
+
 "use client";
+
 
 import maplibregl, {
   LngLatLike,
@@ -21,6 +23,7 @@ import { useMapContext } from "@/lib/hooks/useMapContext";
 
 export default function Map() {
   const { selectedPointOnMap, mapNode } = useMapContext();
+
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreGL | null>(null);
   const [zoom] = useState(5);
