@@ -12,9 +12,6 @@ function Dashboard() {
   const { handleSetMapNode, mapNode } = useMapContext();
   const isLargerThanLG = useBreakpointValue({ base: false, lg: true });
   const [isPanelVisible, setPanelVisible] = useState(false);
-  const [selectedPointOnMap, setSelectedPointOnMap] = useState<number[]>([
-    19.0, 51.5,
-  ]);
 
   useEffect(() => {
     if (!mapNode) {
@@ -55,9 +52,8 @@ function Dashboard() {
             onClick={() => setPanelVisible(!isPanelVisible)}
           />
         )}
-        <Box flex="1" p={5} ml={{ base: 0, lg: "25%" }}>
+        <Box flex="1" p={{base: 2, md: 5}} ml={{ base: 0, lg: "25%" }}>
           {mapNode}
-          {/* <Map selectedPointOnMap={selectedPointOnMap} /> */}
         </Box>
       </Box>
     </>

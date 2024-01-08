@@ -83,7 +83,7 @@ const Navbar = () => {
             <MenuList>
               {session?.user?.isAdmin && (
                 <Link href="/admin">
-                  <MenuItem>Administrator</MenuItem>
+                  <MenuItem>Panel administratora</MenuItem>
                 </Link>
               )}
               <Link href="/profile">

@@ -16,7 +16,13 @@ body {
   position: relative;
   height: calc(
     100dvh - 83px - 2.5rem
-  ); /* calculate height of the screen minus the heading */
+  );
+}
+
+@media (min-width: 48em) {
+  .map-wrap {
+    height: calc(100vh - 83px - 1.5rem);
+  }
 }
 
 .map {

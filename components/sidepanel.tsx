@@ -10,9 +10,7 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useGetFavoriteParkings } from "@/lib/hooks/userHooks";
+import React, { useState } from "react";
 import Search from "./search";
 import { useFavorite } from "@/lib/hooks/useFavorite";
 import { useMapContext } from "@/lib/hooks/useMapContext";
@@ -67,7 +65,6 @@ const SidePanel = () => {
           }
         />
       </HStack>
-
       {tab === "favorites" && (
         <>
           <Heading as="h3" size="md" mb={4}>
@@ -78,18 +75,12 @@ const SidePanel = () => {
             <Flex justify="center" align="center">
               <Spinner />
             </Flex>
+          ) : favoriteParkings?.data?.length === 0 ? (
+            <Flex justify="center" align="center">
+              <Text>Nie posiadasz jeszcze ulubionych parkingów</Text>
+            </Flex>
           ) : (
-            <Box
-              rounded="md"
-              border={
-                favoriteParkings?.data && favoriteParkings.data.length > 0
-                  ? "1px solid #d8dce4"
-                  : "none"
-              }
-              px={2}
-              maxH="50vh"
-              overflowY="auto"
-            >
+            <Box rounded="md" px={2} maxH="100dvh" overflowY="auto">
               {favoriteParkings?.data?.toReversed().map((favParking) => (
                 <Flex
                   key={favParking.id}
