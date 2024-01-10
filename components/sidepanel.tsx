@@ -32,6 +32,7 @@ const SidePanel = () => {
     >
       <Center justifyContent="space-evenly" mb={2}>
         <Button
+          data-testid="ulubione"
           bg={"white"}
           _hover={{
             bg: "#f4f4f5",
@@ -41,6 +42,7 @@ const SidePanel = () => {
           Ulubione
         </Button>
         <Button
+          data-testid="wyszukaj"
           bg={"white"}
           _hover={{
             bg: "#f4f4f5",
