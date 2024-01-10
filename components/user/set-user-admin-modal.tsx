@@ -100,7 +100,7 @@ function SetUserAdminModal({ userId }: Props) {
 
   return (
     <>
-      <Button variant="ghost" onClick={onOpen}>
+      <Button variant="ghost" name="edit" onClick={onOpen}>
         <FiEdit />
       </Button>
 
@@ -108,7 +108,7 @@ function SetUserAdminModal({ userId }: Props) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Zrób administratora</ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton name="close" />
           <ModalBody pb={6}>
             {status === "loading" || !user?.data ? (
               <div>Loading...</div>
