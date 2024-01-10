@@ -15,7 +15,7 @@ body {
 .map-wrap {
   position: relative;
   height: calc(
-    100dvh - 83px - 1.5rem
+    100dvh - 83px - 1rem
   );
 }
 
