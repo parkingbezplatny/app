@@ -7,7 +7,7 @@
     "build": "npx prisma generate && next build",
     "start": "npx prisma generate && next start",
     "lint": "next lint",
-    "test": "npx prisma generate && jest",
+    "test": "npx prisma generate && jest --runInBand --verbose",
     "test:watch": "npx prisma generate && jest --watchAll",
     "prismaMigrate": "npx prisma migrate dev",
     "prismaDeploy": "npx prisma migrate deploy"
