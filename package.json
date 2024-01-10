@@ -7,7 +7,8 @@
     "build": "npx prisma generate && next build",
     "start": "npx prisma generate && next start",
     "lint": "next lint",
-
+    "test": "npx prisma generate && jest",
+    "test:watch": "npx prisma generate && jest --watchAll",
     "prismaMigrate": "npx prisma migrate dev",
     "prismaDeploy": "npx prisma migrate deploy"
   },
@@ -51,6 +52,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-mock-extended": "^3.0.5",
+    "msw": "^2.0.13",
     "prettier": "^3.0.3",
     "prisma": "^5.4.2",
     "ts-jest": "^29.1.1",
