@@ -7,7 +7,12 @@
     "build": "npx prisma generate && next build",
     "start": "npx prisma generate && next start",
     "lint": "next lint",
+<<<<<<< Updated upstream
 
+=======
+    "test": "npx prisma generate && jest --runInBand --verbose",
+    "test:watch": "npx prisma generate && jest --watchAll",
+>>>>>>> Stashed changes
     "prismaMigrate": "npx prisma migrate dev",
     "prismaDeploy": "npx prisma migrate deploy"
   },

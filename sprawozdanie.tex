@@ -1,0 +1,169 @@
+\documentclass{article}
+
+\usepackage[OT4]{polski}
+\usepackage[utf8]{inputenc}
+\usepackage[left=2cm,right=2cm,top=1.5cm,bottom=2cm,includeheadfoot,a4paper]{geometry}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\geometry{a4paper}
+\linespread{1.5}
+\frenchspacing
+\renewcommand{\arraystretch}{1.4}
+
+\title{
+	Projektowanie i programowanie systemów internetowych II\\
+	\Huge{Ice Cream Places}
+}
+
+\date{}
+
+\begin{document}
+	\maketitle
+
+	\section {Opis funkcjonalny systemu}
+    Free Parking to system mający na celu ułatwienie użytkownikom znalezienia darmowych miejsc parkingowych w Polsce. Aplikacja zapewnia różne funkcje, które pomagają w tym celu. Dzięki temu użytkownicy mogą zaoszczędzić czas i pieniądze, a także uniknąć stresu związanego z szukaniem parkingu.
+    
+    \subsection{Aplikacja oferuje szereg funkcjonalności, takich jak:}
+    \begin{itemize}
+        \item \textbf{Autentykacja za pomocą e-maila i hasła} Użytkownicy mogą zarejestrować się w systemie, podając swój adres e-mail i hasło. Po rejestracji, mogą się logować do systemu za pomocą tych danych.
+        \item \textbf{Autentykacja Google} Użytkownicy mają również możliwość rejestracji i logowania za pomocą swojego konta Google.
+        \item \textbf{Mapa z lokalizacjami} System wyświetla mapę Polski, na której zaznaczone są lokalizacje darmowych parkingów. Użytkownicy mogą przeglądać mapę, aby znaleźć najbliższy dostępny parking.
+        \item \textbf{Ulubione parkingi} Użytkownicy mogą dodawać parkingi do listy ulubionych, co ułatwia szybki dostęp do informacji o tych parkingach. Lista ulubionych parkingów jest dostępna w panelu bocznym.
+        \item \textbf{Wyszukiwanie parkingów} Użytkownicy mogą wyszukiwać parkingi według miast.
+        \item \textbf{Edycja profilu} Użytkownicy mogą zmieniać swoją nazwę użytkownika oraz zmieniać hasło.
+        \item \textbf{Admin panel} Administrator może edytować parkingi i użytkowników.
+    \end{itemize}
+
+    \section{Streszczenie opisu technologicznego}
+    Lista najważniejszych technologii i bibliotek, na bazie których powstała aplikacja:
+    \begin{itemize}
+        \item \textbf{Next.js} - framework dla Reacta, który umożliwia tworzenie aplikacji full-stack, rozszerzając najnowsze funkcje Reacta i integrując potężne narzędzia oparte na Rust do najszybszych kompilacji.
+        \item \textbf{TypeScript} - silnie typowany język programowania, który buduje na JavaScript, dając lepsze narzędzia na dowolną skalę.
+        \item \textbf{Prisma} - nowoczesny ORM dla Node.js i TypeScript, obsługujący PostgreSQL, MySQL itp. Zapewnia bezpieczeństwo typów, automatyczne migracje i intuicyjny model danych.
+        \item \textbf{React} - biblioteka do tworzenia interfejsów użytkownika z indywidualnych elementów zwanych komponentami. 
+        \item \textbf{React Hook Form} - prosta i łatwa biblioteka do walidacji formularzy, która redukuje ilość kodu, której potrzebujesz do napisania, jednocześnie eliminując niepotrzebne ponowne renderowania.
+        \item \textbf{TanStack Query} - jest często opisywany jako brakująca biblioteka do pobierania danych dla aplikacji internetowych, ale z bardziej technicznego punktu widzenia sprawia, że pobieranie, buforowanie, synchronizowanie i aktualizowanie stanu serwera w aplikacjach internetowych jest dziecinnie proste.
+        \item \textbf{React Icons} - pakiet, który pozwala na importowanie i używanie popularnych ikon z różnych bibliotek ikon w projektach React.
+        \item \textbf{Zod} - biblioteka do deklarowania i walidacji schematów w TypeScript, z inferencją statycznego typu. 
+        \item \textbf{ChakraUI} - biblioteka komponentów interfejsu użytkownika dla Reacta, umożliwiająca szybkie tworzenie atrakcyjnych i spójnych interfejsów.
+        \item \textbf{GitHub} -  miejsce do kontroli wersji kodu. Pozwala na łatwą synchronizację między członkami grupy oraz na prostą kontrolę zmian w kodzie.
+        \item \textbf{ESLint} -  narzędzie do analizy statycznej kodu JavaScript w celu wykrycia problemów i niezgodności ze standardami kodowania.
+        \item \textbf{Prettier} -  narzędzie do formatowania kodu, zapewniające spójny styl kodowania w całym projekcie.
+    \end{itemize}
+
+    \section{Instrukcja lokalnego i zdalnego uruchomienia}
+       \subsection{Lokalnie}
+            \begin{itemize}
+                \item Najpierw należy pobrać i zainstalować Node.js ze strony                 
+                    \begin{lstlisting}
+    https://nodejs.org/en/
+                    \end{lstlisting}
+                \item Następnie należy sklonować repozytorium za pomocą 
+                    \begin{lstlisting}
+    git clone https://github.com/parkingbezplatny/app.git
+                    \end{lstlisting}
+                \item Kolejno otworzyć terminal oraz przejść do folderu aplikacji oraz wpisać 
+                    \begin{lstlisting}
+    npm install              
+                    \end{lstlisting}
+                \item Po instalacji wystarczy wpisać w terminalu
+                    \begin{lstlisting}
+    npm run dev
+                    \end{lstlisting} 
+                \item Po chwili kompilacji powinna otworzyć się nasza aplikacja pod adresem 
+                    \begin{lstlisting}
+    http://localhost:3000/                        
+                    \end{lstlisting}
+            \item Aplikacja potrzebuje do działania pliku \textbf{.env}, w którym będą następujące informacje:
+            \begin{itemize}
+                \item \textbf{DATABASE\_URL} - URL do bazy danych
+                \item \textbf{DIRECT\_URL} - direct URL do bazy danych
+                \item \textbf{GOOGLE\_CLIENT\_ID} - clientId otrzymane od Google
+                \item \textbf{GOOGLE\_CLIENT\_SECRET} - clientSecret otrzymany od Google
+                \item \textbf{NEXTAUTH\_URL} - URL strony dla biblioteki NextAuth (http://localhost:3000)
+                \item \textbf{NEXTAUTH\_SECRET} - klucz secret dla biblioteki NextAuth
+                \item \textbf{NEXT\_PUBLIC\_MAP\_API\_KEY} - klucz do API dostawcy mapy
+                \item \textbf{NEXT\_PUBLIC\_HERE\_API\_KEY} - klucz do API dostawcy geocodingu
+            \end{itemize}
+        \end{itemize}
+            
+
+            \subsection{Zdalnie}
+            \begin{itemize}
+                \item Strona internetowa aplikacji jest dostępna pod adresem 
+                    \begin{lstlisting}
+    https://freeparkingapp.vercel.app/
+                    \end{lstlisting}
+            \end{itemize}
+
+            \subsection{Testy}
+                \begin{itemize}
+                    \item Po uruchomieniu lokalnie uruchamiając terminal w folderze z projektem wpisać
+                        \begin{lstlisting}
+    npm run test
+                        \end{lstlisting}
+                    \item Spis scenariuszy testowych wygenerowany po uruchomieniu testów:
+                                    \begin{lstlisting}
+PASS  __tests__/user/ChangePasswordModal.test.tsx
+  ChangePasswordModal
+    renders ChangePasswordModal correctly (762 ms)
+
+PASS  __tests__/user/ChangeUsernameModal.test.tsx
+  ChangeUsernameModal
+    renders ChangeUsernameModal correctly (494 ms)
+
+ PASS  __tests__/Sidepanel.test.tsx
+  SidePanel
+    renders SidePanel correctly (109 ms)
+    handles click event correctly (34 ms)
+
+ PASS  __tests__/AdminSidepanel.test.tsx
+  AdminSidePanel
+    renders AdminSidePanel correctly (104 ms)
+
+ PASS  __tests__/WelcomePage.test.tsx
+  WelcomePage
+    redirects to dashboard if user is authenticated (104 ms)
+    renders the WelcomePage component correctly (45 ms)
+
+ PASS  __tests__/Navbar.test.tsx
+  Navbar
+    renders Navbar correctly (157 ms)
+    handles click event correctly (104 ms)
+
+ PASS  __tests__/MapTooltip.test.tsx
+  MapTooltip
+    renders MapTooltip correctly (71 ms)
+
+ PASS  __tests__/Search.test.tsx
+  Search
+    renders Search correctly (122 ms)
+    handles error correctly (55 ms)
+
+ PASS  __tests__/AdminCard.test.tsx
+  AdminCard
+    renders AdminCard component correctly (59 ms)
+    renders AdminCard component without footer (14 ms)
+
+Test Suites: 9 passed, 9 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        17.822 s, estimated 18 s
+
+                \end{lstlisting}
+            \end{itemize}
+
+    
+
+    \section{Linki do dokumentacji projektu}
+    \begin{itemize}
+        \item \textbf{GitHub} - \href{https://github.com/parkingbezplatny/app}{https://github.com/parkingbezplatny/app}
+    \end{itemize}
+    \section{Wnioski projektowe}
+    Podczas realizacji projektu systemu Free Parking, napotkaliśmy na kilka wyzwań. Najbardziej wymagającym elementem było zaimplementowanie mapy oraz zarządzanie dużą ilością danych o parkingach. Te zadania wymagały skomplikowanych rozwiązań technicznych i dużej ilości czasu na analizę i optymalizację.
+Mimo tych wyzwań, naszym głównym celem było stworzenie intuicyjnego i prostego interfejsu dla użytkowników. Dzięki ciężkiej pracy i zaangażowaniu zespołu, udało nam się osiągnąć ten cel. Interfejs jest łatwy w obsłudze, a funkcje, takie jak wyszukiwanie parkingów czy dodawanie do ulubionych, są proste i intuicyjne.
+Podsumowując, projekt zakończył się sukcesem. Współpraca w zespole była owocna, a wynikiem naszej pracy jest funkcjonalny i przyjazny dla użytkownika system.
+
+
+\end{document}
