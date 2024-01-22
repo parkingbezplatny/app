@@ -25,7 +25,7 @@
     "bcrypt": "^5.1.1",
     "framer-motion": "^10.16.16",
     "maplibre-gl": "^3.6.2",
-    "next": "^13.5.4",
+    "next": "^13.5.6",
     "next-auth": "^4.24.5",
     "react": "^18",
     "react-dom": "^18",
